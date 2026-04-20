@@ -31,6 +31,7 @@ Sistema web de gerenciamento de cadastros para uma hamburgueria, desenvolvido co
 ---
 
 ## 📁 Estrutura do Projeto
+```plaintext
 restauranteHamburgueria/
 ├── src/
 │   └── main/
@@ -57,8 +58,7 @@ restauranteHamburgueria/
 │           └── META-INF/
 │               └── persistence.xml
 └── pom.xml
-
-
+```
 ---
 
 ## ⚙️ Configuração
