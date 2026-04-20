@@ -1,0 +1,36 @@
+# ===== MAVEN =====
+target/
+*.class
+*.war
+*.jar
+*.ear
+
+# ===== NETBEANS =====
+nbproject/private/
+nbproject/Makefile-*.mk
+nbproject/Package-*.bash
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+nb-configuration.xml
+
+# ===== GLASSFISH =====
+*.log
+*.lck
+
+# ===== IDE GERAL =====
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ===== SISTEMA OPERACIONAL =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== DEPENDÊNCIAS =====
+*.m2/

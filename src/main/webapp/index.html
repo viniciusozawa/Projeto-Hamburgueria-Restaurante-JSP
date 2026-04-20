@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Hamburgueria</title>
+    <link rel="stylesheet" href="styles/estilo.css">
+    <style>
+        .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 30px; }
+        .card { background: #f4f6f8; border-radius: 12px; padding: 24px 30px; text-align: center; width: 150px; text-decoration: none; color: #2c3e50; box-shadow: 0 3px 10px rgba(0,0,0,0.08); transition: 0.2s; }
+        .card:hover { background: #f39c12; color: white; transform: translateY(-4px); }
+        .card .icon { font-size: 32px; margin-bottom: 10px; }
+        .card span { font-weight: bold; font-size: 14px; }
+        .hero { text-align: center; padding: 20px 0 10px; color: #666; font-size: 15px; }
+    </style>
+</head>
+<body>
+<nav>
+    <a class="logo" href="index.html">🍔 Hamburgueria</a>
+    <ul>
+        <li><a href="com/mycompany/restaurantehamburgueria/controller/CargoController?opcao=listar">Cargo</a></li>
+        <li><a href="com/mycompany/restaurantehamburgueria/controller/CategoriaController?opcao=listar">Categoria</a></li>
+        <li><a href="com/mycompany/restaurantehamburgueria/controller/ClienteController?opcao=listar">Cliente</a></li>
+        <li><a href="com/mycompany/restaurantehamburgueria/controller/FornecedorController?opcao=listar">Fornecedor</a></li>
+        <li><a href="com/mycompany/restaurantehamburgueria/controller/MesaController?opcao=listar">Mesa</a></li>
+        <li><a href="com/mycompany/restaurantehamburgueria/controller/TurnosController?opcao=listar">Turnos</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h1>Sistema de Gerenciamento</h1>
+    <p class="hero">Selecione um módulo para gerenciar os cadastros</p>
+    <div class="cards">
+        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/CargoController?opcao=listar">
+            <div class="icon">👔</div><span>Cargo</span>
+        </a>
+        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/CategoriaController?opcao=listar">
+            <div class="icon">🏷️</div><span>Categoria</span>
+        </a>
+        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/ClienteController?opcao=listar">
+            <div class="icon">👤</div><span>Cliente</span>
+        </a>
+        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/FornecedorController?opcao=listar">
+            <div class="icon">🚚</div><span>Fornecedor</span>
+        </a>
+        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/MesaController?opcao=listar">
+            <div class="icon">🪑</div><span>Mesa</span>
+        </a>
+        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/TurnosController?opcao=listar">
+            <div class="icon">🕐</div><span>Turnos</span>
+        </a>
+    </div>
+</div>
+</body>
+</html>
