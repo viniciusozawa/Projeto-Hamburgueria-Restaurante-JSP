@@ -31,14 +31,29 @@ public class ClienteController extends HttpServlet {
 
         try {
             switch (opcao) {
-                case "listar"           -> encaminhar(request, response);
-                case "cadastrar"        -> cadastrar(request, response, nomeIn, cpfIn, senhaIn, telIn);
-                case "enviarAlterar"    -> enviarAlterar(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn, dataIn);
-                case "confirmarAlterar" -> confirmarAlterar(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn);
-                case "enviarExcluir"    -> enviarExcluir(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn, dataIn);
-                case "confirmarExcluir" -> confirmarExcluir(request, response, codIn);
-                case "cancelar"         -> encaminhar(request, response);
-                default                 -> encaminhar(request, response);
+                case "listar":
+                    encaminhar(request, response);
+                    break;
+                case "cadastrar":
+                    cadastrar(request, response, nomeIn, cpfIn, senhaIn, telIn);
+                    break;
+                case "enviarAlterar":
+                    enviarAlterar(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn, dataIn);
+                    break;
+                case "confirmarAlterar":
+                    confirmarAlterar(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn);
+                    break;
+                case "enviarExcluir":
+                    enviarExcluir(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn, dataIn);
+                    break;
+                case "confirmarExcluir":
+                    confirmarExcluir(request, response, codIn);
+                    break;
+                case "cancelar":
+                    encaminhar(request, response);
+                    break;
+                default:
+                    encaminhar(request, response);
             }
         } catch (Exception e) {
             response.getWriter().println("Erro: " + e.getMessage());

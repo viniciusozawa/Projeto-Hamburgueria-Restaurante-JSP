@@ -27,14 +27,29 @@ public class CategoriaController extends HttpServlet {
 
         try {
             switch (opcao) {
-                case "listar" -> encaminhar(request, response, null);
-                case "cadastrar" -> cadastrar(request, response, nomeIn);
-                case "enviarAlterar" -> enviarAlterar(request, response, codIn, nomeIn);
-                case "confirmarAlterar" -> confirmarAlterar(request, response, codIn, nomeIn);
-                case "enviarExcluir" -> enviarExcluir(request, response, codIn, nomeIn);
-                case "confirmarExcluir" -> confirmarExcluir(request, response, codIn);
-                case "cancelar" -> encaminhar(request, response, null);
-                default -> encaminhar(request, response, null);
+                case "listar":
+                    encaminhar(request, response, null);
+                    break;
+                case "cadastrar":
+                    cadastrar(request, response, nomeIn);
+                    break;
+                case "enviarAlterar":
+                    enviarAlterar(request, response, codIn, nomeIn);
+                    break;
+                case "confirmarAlterar":
+                    confirmarAlterar(request, response, codIn, nomeIn);
+                    break;
+                case "enviarExcluir":
+                    enviarExcluir(request, response, codIn, nomeIn);
+                    break;
+                case "confirmarExcluir":
+                    confirmarExcluir(request, response, codIn);
+                    break;
+                case "cancelar":
+                    encaminhar(request, response, null);
+                    break;
+                default:
+                    encaminhar(request, response, null);
             }
         } catch (Exception e) {
             response.getWriter().println("Erro: " + e.getMessage());

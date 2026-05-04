@@ -29,14 +29,29 @@ public class TurnosController extends HttpServlet {
 
         try {
             switch (opcao) {
-                case "listar"           -> encaminhar(request, response);
-                case "cadastrar"        -> cadastrar(request, response, inicioIn, finalIn);
-                case "enviarAlterar"    -> enviarAlterar(request, response, codIn, inicioIn, finalIn);
-                case "confirmarAlterar" -> confirmarAlterar(request, response, codIn, inicioIn, finalIn);
-                case "enviarExcluir"    -> enviarExcluir(request, response, codIn, inicioIn, finalIn);
-                case "confirmarExcluir" -> confirmarExcluir(request, response, codIn);
-                case "cancelar"         -> encaminhar(request, response);
-                default                 -> encaminhar(request, response);
+                case "listar":
+                    encaminhar(request, response);
+                    break;
+                case "cadastrar":
+                    cadastrar(request, response, inicioIn, finalIn);
+                    break;
+                case "enviarAlterar":
+                    enviarAlterar(request, response, codIn, inicioIn, finalIn);
+                    break;
+                case "confirmarAlterar":
+                    confirmarAlterar(request, response, codIn, inicioIn, finalIn);
+                    break;
+                case "enviarExcluir":
+                    enviarExcluir(request, response, codIn, inicioIn, finalIn);
+                    break;
+                case "confirmarExcluir":
+                    confirmarExcluir(request, response, codIn);
+                    break;
+                case "cancelar":
+                    encaminhar(request, response);
+                    break;
+                default:
+                    encaminhar(request, response);
             }
         } catch (Exception e) {
             response.getWriter().println("Erro: " + e.getMessage());

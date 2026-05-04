@@ -28,14 +28,29 @@ public class MesaController extends HttpServlet {
 
         try {
             switch (opcao) {
-                case "listar"           -> encaminhar(request, response);
-                case "cadastrar"        -> cadastrar(request, response, numIn, localIn);
-                case "enviarAlterar"    -> enviarAlterar(request, response, codIn, numIn, localIn);
-                case "confirmarAlterar" -> confirmarAlterar(request, response, codIn, numIn, localIn);
-                case "enviarExcluir"    -> enviarExcluir(request, response, codIn, numIn, localIn);
-                case "confirmarExcluir" -> confirmarExcluir(request, response, codIn);
-                case "cancelar"         -> encaminhar(request, response);
-                default                 -> encaminhar(request, response);
+                case "listar":
+                    encaminhar(request, response);
+                    break;
+                case "cadastrar":
+                    cadastrar(request, response, numIn, localIn);
+                    break;
+                case "enviarAlterar":
+                    enviarAlterar(request, response, codIn, numIn, localIn);
+                    break;
+                case "confirmarAlterar":
+                    confirmarAlterar(request, response, codIn, numIn, localIn);
+                    break;
+                case "enviarExcluir":
+                    enviarExcluir(request, response, codIn, numIn, localIn);
+                    break;
+                case "confirmarExcluir":
+                    confirmarExcluir(request, response, codIn);
+                    break;
+                case "cancelar":
+                    encaminhar(request, response);
+                    break;
+                default:
+                    encaminhar(request, response);
             }
         } catch (Exception e) {
             response.getWriter().println("Erro: " + e.getMessage());
