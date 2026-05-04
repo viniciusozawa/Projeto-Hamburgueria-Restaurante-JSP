@@ -32,14 +32,29 @@ public class FornecedorController extends HttpServlet {
 
         try {
             switch (opcao) {
-                case "listar"           -> encaminhar(request, response);
-                case "cadastrar"        -> cadastrar(request, response, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
-                case "enviarAlterar"    -> enviarAlterar(request, response, codIn, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
-                case "confirmarAlterar" -> confirmarAlterar(request, response, codIn, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
-                case "enviarExcluir"    -> enviarExcluir(request, response, codIn, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
-                case "confirmarExcluir" -> confirmarExcluir(request, response, codIn);
-                case "cancelar"         -> encaminhar(request, response);
-                default                 -> encaminhar(request, response);
+                case "listar":
+                    encaminhar(request, response);
+                    break;
+                case "cadastrar":
+                    cadastrar(request, response, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
+                    break;
+                case "enviarAlterar":
+                    enviarAlterar(request, response, codIn, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
+                    break;
+                case "confirmarAlterar":
+                    confirmarAlterar(request, response, codIn, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
+                    break;
+                case "enviarExcluir":
+                    enviarExcluir(request, response, codIn, nomeIn, cnpjIn, endIn, bairroIn, cidadeIn, estadoIn);
+                    break;
+                case "confirmarExcluir":
+                    confirmarExcluir(request, response, codIn);
+                    break;
+                case "cancelar":
+                    encaminhar(request, response);
+                    break;
+                default:
+                    encaminhar(request, response);
             }
         } catch (Exception e) {
             response.getWriter().println("Erro: " + e.getMessage());
