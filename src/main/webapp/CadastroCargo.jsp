@@ -148,7 +148,7 @@
                     <div class="admin-card-header">
                         <h5><i class="fa-solid fa-list"></i> Cargos Cadastrados</h5>
                         <span class="badge" style="background:rgba(243,156,18,0.15);color:#f39c12;font-size:0.8rem;padding:0.4rem 0.8rem;border-radius:20px;">
-                            <c:out value="${fn:length(cargos)}" default=""/> registros
+                            Cargos
                         </span>
                     </div>
                     <div class="admin-card-body p-0">
