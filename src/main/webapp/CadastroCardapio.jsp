@@ -7,14 +7,14 @@
     }
     String nomeGerente = (String) session.getAttribute("gerente");
     String URL_BASE = "/com/mycompany/restaurantehamburgueria/controller";
-    String paginaAtiva = "turno";
+    String paginaAtiva = "cardapio";
 %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnos - Painel do Gerente</title>
+    <title>Cardápio - Painel do Gerente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -25,19 +25,18 @@
 
     <%@ include file="gerente/sidebar.jsp" %>
 
-    <!-- CONTEÚDO -->
     <div class="admin-content">
         <div class="admin-topbar">
             <div class="topbar-left">
                 <button id="sidebarToggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <div>
-                    <div class="topbar-title">Turnos</div>
+                    <div class="topbar-title">Cardápio</div>
                     <div class="topbar-breadcrumb">
                         <i class="fa-solid fa-house fa-xs"></i>
                         <i class="fa-solid fa-chevron-right fa-xs opacity-50"></i>
                         <a href="${pageContext.request.contextPath}/gerente/dashboard.jsp">Dashboard</a>
                         <i class="fa-solid fa-chevron-right fa-xs opacity-50"></i>
-                        <span>Turnos</span>
+                        <span>Cardápio</span>
                     </div>
                 </div>
             </div>
@@ -53,7 +52,6 @@
         </div>
 
         <div class="admin-page">
-
             <c:if test="${not empty mensagem}">
                 <div class="admin-mensagem">
                     <i class="fa-solid fa-circle-check"></i> ${mensagem}
@@ -62,28 +60,41 @@
 
             <div class="admin-card mb-4">
                 <div class="admin-card-header">
-                    <h5><i class="fa-solid fa-clock"></i> ${empty opcao ? 'Novo Turno' : 'Gerenciar Turno'}</h5>
+                    <h5><i class="fa-solid fa-utensils"></i>
+                        ${empty opcao || opcao == 'cadastrar' ? 'Novo Item' : 'Editar Item'}
+                    </h5>
                 </div>
                 <div class="admin-card-body admin-form">
-                    <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController">
+                    <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/CardapioController">
                         <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}" />
-                        <input type="hidden" name="codTurnos" value="${empty codTurnos ? 0 : codTurnos}" />
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label">Horário Início</label>
-                                <input type="time" class="form-control" name="horarioInicio"
-                                       value="${horarioInicio}" required />
+                        <input type="hidden" name="codCardapio" value="${empty codCardapio ? 0 : codCardapio}" />
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Nome do Prato</label>
+                                <input type="text" class="form-control" name="nomeComida" value="${nomeComida}" required />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor (R$)</label>
+                                <input type="number" step="0.01" class="form-control" name="valorComida" value="${valorComida}" required />
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Horário Final</label>
-                                <input type="time" class="form-control" name="horarioFinal"
-                                       value="${horarioFinal}" required />
+                                <label class="form-label">Categoria</label>
+                                <select class="form-select" name="categoria_codCategoria" required>
+                                    <option value="">Selecione...</option>
+                                    <c:forEach var="cat" items="${categorias}">
+                                        <option value="${cat.codCategoria}">${cat.nomeCategoria}</option>
+                                    </c:forEach>
+                                </select>
                             </div>
-                            <div class="col-auto d-flex gap-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Descrição</label>
+                                <input type="text" class="form-control" name="descricaoComida" value="${descricaoComida}" />
+                            </div>
+                            <div class="col-auto d-flex gap-2 align-items-end">
                                 <button type="submit" class="btn-admin-salvar">
                                     <i class="fa-solid fa-floppy-disk"></i> Salvar
                                 </button>
-                                <a href="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController?opcao=cancelar"
+                                <a href="${pageContext.request.contextPath}<%= URL_BASE %>/CardapioController?opcao=cancelar"
                                    class="btn-admin-cancelar text-decoration-none">
                                     <i class="fa-solid fa-xmark"></i> Cancelar
                                 </a>
@@ -93,10 +104,10 @@
                 </div>
             </div>
 
-            <c:if test="${not empty turnos}">
+            <c:if test="${not empty cardapios}">
                 <div class="admin-card">
                     <div class="admin-card-header">
-                        <h5><i class="fa-solid fa-list"></i> Turnos Cadastrados</h5>
+                        <h5><i class="fa-solid fa-list"></i> Itens do Cardápio</h5>
                     </div>
                     <div class="admin-card-body p-0">
                         <div class="table-responsive">
@@ -104,39 +115,39 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Horário Início</th>
-                                        <th>Horário Final</th>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Valor</th>
+                                        <th>Descrição</th>
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="item" items="${turnos}">
+                                    <c:forEach var="item" items="${cardapios}">
                                         <tr>
-                                            <td class="text-muted">${item.codTurnos}</td>
-                                            <td>
-                                                <span class="badge" style="background:rgba(26,188,156,0.12);color:#1abc9c;font-size:0.85rem;padding:0.4rem 0.8rem;border-radius:8px;">
-                                                    <i class="fa-solid fa-play fa-xs me-1"></i>${item.horarioInicio}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="badge" style="background:rgba(231,76,60,0.1);color:#e74c3c;font-size:0.85rem;padding:0.4rem 0.8rem;border-radius:8px;">
-                                                    <i class="fa-solid fa-stop fa-xs me-1"></i>${item.horarioFinal}
-                                                </span>
-                                            </td>
+                                            <td class="text-muted">${item.codCardapio}</td>
+                                            <td><strong>${item.nomeComida}</strong></td>
+                                            <td>${item.nomeCategoria}</td>
+                                            <td>R$ ${item.valorComida}</td>
+                                            <td class="text-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.descricaoComida}</td>
                                             <td class="text-end actions-cell">
-                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController" style="display:inline">
+                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/CardapioController" style="display:inline">
                                                     <input type="hidden" name="opcao" value="enviarAlterar" />
-                                                    <input type="hidden" name="codTurnos" value="${item.codTurnos}" />
-                                                    <input type="hidden" name="horarioInicio" value="${item.horarioInicio}" />
-                                                    <input type="hidden" name="horarioFinal" value="${item.horarioFinal}" />
-                                                    <button type="submit" class="btn-admin-alterar"><i class="fa-solid fa-pen"></i> Alterar</button>
+                                                    <input type="hidden" name="codCardapio" value="${item.codCardapio}" />
+                                                    <input type="hidden" name="nomeComida" value="${item.nomeComida}" />
+                                                    <input type="hidden" name="valorComida" value="${item.valorComida}" />
+                                                    <input type="hidden" name="descricaoComida" value="${item.descricaoComida}" />
+                                                    <input type="hidden" name="categoria_codCategoria" value="${item.categoria_codCategoria}" />
+                                                    <button type="submit" class="btn-admin-alterar">
+                                                        <i class="fa-solid fa-pen"></i> Alterar
+                                                    </button>
                                                 </form>
-                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController" style="display:inline">
+                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/CardapioController" style="display:inline">
                                                     <input type="hidden" name="opcao" value="enviarExcluir" />
-                                                    <input type="hidden" name="codTurnos" value="${item.codTurnos}" />
-                                                    <input type="hidden" name="horarioInicio" value="${item.horarioInicio}" />
-                                                    <input type="hidden" name="horarioFinal" value="${item.horarioFinal}" />
-                                                    <button type="submit" class="btn-admin-excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
+                                                    <input type="hidden" name="codCardapio" value="${item.codCardapio}" />
+                                                    <button type="submit" class="btn-admin-excluir">
+                                                        <i class="fa-solid fa-trash"></i> Excluir
+                                                    </button>
                                                 </form>
                                             </td>
                                         </tr>

@@ -7,6 +7,7 @@
     }
     String nomeGerente = (String) session.getAttribute("gerente");
     String URL_BASE = "/com/mycompany/restaurantehamburgueria/controller";
+    String paginaAtiva = "categoria";
 %>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -22,58 +23,7 @@
 <body>
 <div class="d-flex">
 
-    <!-- SIDEBAR -->
-    <nav class="admin-sidebar" id="adminSidebar">
-        <div class="sidebar-brand">
-            <div class="brand-icon"><i class="fa-solid fa-burger"></i></div>
-            <div>
-                <div class="brand-name">Hamburgueria</div>
-                <div class="brand-sub">Painel Administrativo</div>
-            </div>
-        </div>
-        <div class="sidebar-user">
-            <div class="user-avatar"><i class="fa-solid fa-user-tie fa-sm"></i></div>
-            <div>
-                <div class="user-name"><%= nomeGerente %></div>
-                <div class="user-role">Gerente</div>
-            </div>
-        </div>
-        <div class="sidebar-nav">
-            <div class="nav-section-title">Principal</div>
-            <a href="${pageContext.request.contextPath}/gerente/dashboard.jsp" class="sidebar-link">
-                <i class="fa-solid fa-gauge nav-icon"></i> Dashboard
-            </a>
-            <div class="nav-section-title mt-2">Cadastros</div>
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/CargoController?opcao=listar" class="sidebar-link">
-                <i class="fa-solid fa-id-badge nav-icon"></i> Cargo
-            </a>
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/CategoriaController?opcao=listar" class="sidebar-link active">
-                <i class="fa-solid fa-tags nav-icon"></i> Categoria
-            </a>
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/ClienteController?opcao=listar" class="sidebar-link">
-                <i class="fa-solid fa-users nav-icon"></i> Clientes
-            </a>
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/FornecedorController?opcao=listar" class="sidebar-link">
-                <i class="fa-solid fa-truck nav-icon"></i> Fornecedores
-            </a>
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/MesaController?opcao=listar" class="sidebar-link">
-                <i class="fa-solid fa-chair nav-icon"></i> Mesas
-            </a>
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController?opcao=listar" class="sidebar-link">
-                <i class="fa-solid fa-clock nav-icon"></i> Turnos
-            </a>
-            <div class="nav-section-title mt-2">Site</div>
-            <a href="${pageContext.request.contextPath}/index.html" class="sidebar-link" target="_blank">
-                <i class="fa-solid fa-globe nav-icon"></i> Ver Site
-                <i class="fa-solid fa-arrow-up-right-from-square fa-xs ms-auto opacity-50"></i>
-            </a>
-        </div>
-        <div class="sidebar-footer">
-            <a href="${pageContext.request.contextPath}<%= URL_BASE %>/LogoutController" class="btn-logout">
-                <i class="fa-solid fa-right-from-bracket fa-sm"></i> Sair
-            </a>
-        </div>
-    </nav>
+    <%@ include file="gerente/sidebar.jsp" %>
 
     <!-- CONTEÚDO -->
     <div class="admin-content">

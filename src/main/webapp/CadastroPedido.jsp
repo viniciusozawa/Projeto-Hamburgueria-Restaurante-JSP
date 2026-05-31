@@ -7,14 +7,14 @@
     }
     String nomeGerente = (String) session.getAttribute("gerente");
     String URL_BASE = "/com/mycompany/restaurantehamburgueria/controller";
-    String paginaAtiva = "turno";
+    String paginaAtiva = "pedido";
 %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnos - Painel do Gerente</title>
+    <title>Pedidos - Painel do Gerente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -25,19 +25,18 @@
 
     <%@ include file="gerente/sidebar.jsp" %>
 
-    <!-- CONTEÚDO -->
     <div class="admin-content">
         <div class="admin-topbar">
             <div class="topbar-left">
                 <button id="sidebarToggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <div>
-                    <div class="topbar-title">Turnos</div>
+                    <div class="topbar-title">Pedidos</div>
                     <div class="topbar-breadcrumb">
                         <i class="fa-solid fa-house fa-xs"></i>
                         <i class="fa-solid fa-chevron-right fa-xs opacity-50"></i>
                         <a href="${pageContext.request.contextPath}/gerente/dashboard.jsp">Dashboard</a>
                         <i class="fa-solid fa-chevron-right fa-xs opacity-50"></i>
-                        <span>Turnos</span>
+                        <span>Pedidos</span>
                     </div>
                 </div>
             </div>
@@ -53,7 +52,6 @@
         </div>
 
         <div class="admin-page">
-
             <c:if test="${not empty mensagem}">
                 <div class="admin-mensagem">
                     <i class="fa-solid fa-circle-check"></i> ${mensagem}
@@ -62,41 +60,53 @@
 
             <div class="admin-card mb-4">
                 <div class="admin-card-header">
-                    <h5><i class="fa-solid fa-clock"></i> ${empty opcao ? 'Novo Turno' : 'Gerenciar Turno'}</h5>
+                    <h5><i class="fa-solid fa-receipt"></i> Novo Pedido</h5>
                 </div>
                 <div class="admin-card-body admin-form">
-                    <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController">
-                        <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}" />
-                        <input type="hidden" name="codTurnos" value="${empty codTurnos ? 0 : codTurnos}" />
+                    <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/PedidoController">
+                        <input type="hidden" name="opcao" value="cadastrar" />
                         <div class="row g-3 align-items-end">
                             <div class="col-md-3">
-                                <label class="form-label">Horário Início</label>
-                                <input type="time" class="form-control" name="horarioInicio"
-                                       value="${horarioInicio}" required />
+                                <label class="form-label">Cliente</label>
+                                <select class="form-select" name="cliente_codCliente" required>
+                                    <option value="">Selecione...</option>
+                                    <c:forEach var="c" items="${clientes}">
+                                        <option value="${c.codCliente}">${c.nomeCliente}</option>
+                                    </c:forEach>
+                                </select>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Horário Final</label>
-                                <input type="time" class="form-control" name="horarioFinal"
-                                       value="${horarioFinal}" required />
+                                <label class="form-label">Mesa</label>
+                                <select class="form-select" name="mesa_codMesa" required>
+                                    <option value="">Selecione...</option>
+                                    <c:forEach var="m" items="${mesas}">
+                                        <option value="${m.codMesa}">Mesa ${m.numeroMesa} - ${m.localMesa}</option>
+                                    </c:forEach>
+                                </select>
                             </div>
-                            <div class="col-auto d-flex gap-2">
+                            <div class="col-md-3">
+                                <label class="form-label">Funcionário</label>
+                                <select class="form-select" name="funcionario_codFuncionario" required>
+                                    <option value="">Selecione...</option>
+                                    <c:forEach var="f" items="${funcionarios}">
+                                        <option value="${f.codFuncionario}">${f.nomeFuncionario}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="col-auto">
                                 <button type="submit" class="btn-admin-salvar">
-                                    <i class="fa-solid fa-floppy-disk"></i> Salvar
+                                    <i class="fa-solid fa-plus"></i> Registrar Pedido
                                 </button>
-                                <a href="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController?opcao=cancelar"
-                                   class="btn-admin-cancelar text-decoration-none">
-                                    <i class="fa-solid fa-xmark"></i> Cancelar
-                                </a>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <c:if test="${not empty turnos}">
+            <c:if test="${not empty pedidos}">
                 <div class="admin-card">
                     <div class="admin-card-header">
-                        <h5><i class="fa-solid fa-list"></i> Turnos Cadastrados</h5>
+                        <h5><i class="fa-solid fa-list"></i> Pedidos Registrados</h5>
                     </div>
                     <div class="admin-card-body p-0">
                         <div class="table-responsive">
@@ -104,39 +114,28 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Horário Início</th>
-                                        <th>Horário Final</th>
+                                        <th>Cliente</th>
+                                        <th>Mesa</th>
+                                        <th>Funcionário</th>
+                                        <th>Data/Hora</th>
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="item" items="${turnos}">
+                                    <c:forEach var="item" items="${pedidos}">
                                         <tr>
-                                            <td class="text-muted">${item.codTurnos}</td>
-                                            <td>
-                                                <span class="badge" style="background:rgba(26,188,156,0.12);color:#1abc9c;font-size:0.85rem;padding:0.4rem 0.8rem;border-radius:8px;">
-                                                    <i class="fa-solid fa-play fa-xs me-1"></i>${item.horarioInicio}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="badge" style="background:rgba(231,76,60,0.1);color:#e74c3c;font-size:0.85rem;padding:0.4rem 0.8rem;border-radius:8px;">
-                                                    <i class="fa-solid fa-stop fa-xs me-1"></i>${item.horarioFinal}
-                                                </span>
-                                            </td>
+                                            <td class="text-muted">${item.codpedido}</td>
+                                            <td><strong>${item.nomeCliente}</strong></td>
+                                            <td>Mesa ${item.numeroMesa}</td>
+                                            <td>${item.nomeFuncionario}</td>
+                                            <td>${item.datahoraPedido}</td>
                                             <td class="text-end actions-cell">
-                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController" style="display:inline">
-                                                    <input type="hidden" name="opcao" value="enviarAlterar" />
-                                                    <input type="hidden" name="codTurnos" value="${item.codTurnos}" />
-                                                    <input type="hidden" name="horarioInicio" value="${item.horarioInicio}" />
-                                                    <input type="hidden" name="horarioFinal" value="${item.horarioFinal}" />
-                                                    <button type="submit" class="btn-admin-alterar"><i class="fa-solid fa-pen"></i> Alterar</button>
-                                                </form>
-                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/TurnosController" style="display:inline">
+                                                <form method="get" action="${pageContext.request.contextPath}<%= URL_BASE %>/PedidoController" style="display:inline">
                                                     <input type="hidden" name="opcao" value="enviarExcluir" />
-                                                    <input type="hidden" name="codTurnos" value="${item.codTurnos}" />
-                                                    <input type="hidden" name="horarioInicio" value="${item.horarioInicio}" />
-                                                    <input type="hidden" name="horarioFinal" value="${item.horarioFinal}" />
-                                                    <button type="submit" class="btn-admin-excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
+                                                    <input type="hidden" name="codpedido" value="${item.codpedido}" />
+                                                    <button type="submit" class="btn-admin-excluir">
+                                                        <i class="fa-solid fa-trash"></i> Excluir
+                                                    </button>
                                                 </form>
                                             </td>
                                         </tr>
