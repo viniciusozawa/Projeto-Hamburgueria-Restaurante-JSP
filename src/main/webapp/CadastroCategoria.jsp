@@ -9,7 +9,7 @@
 </head>
 <body>
 <nav>
-    <a class="logo" href="${pageContext.request.contextPath}/index.html">? Hamburgueria</a>
+    <a class="logo" href="${pageContext.request.contextPath}/index.html"> Hamburgueria</a>
     <ul>
         <li><a href="${pageContext.request.contextPath}${URL_BASE}/CargoController?opcao=listar">Cargo</a></li>
         <li><a href="${pageContext.request.contextPath}${URL_BASE}/CategoriaController?opcao=listar" class="ativo">Categoria</a></li>

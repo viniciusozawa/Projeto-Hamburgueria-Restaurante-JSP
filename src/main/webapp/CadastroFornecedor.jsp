@@ -1,5 +1,5 @@
 
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="c" uri="jakarta.tags.core"%>
 <%@page contentType="text/html" pageEncoding="Latin1"%>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -10,7 +10,7 @@
     </head>
     <body>
         <nav>
-            <a class="logo" href="${pageContext.request.contextPath}/index.html">? Hamburgueria</a>
+            <a class="logo" href="${pageContext.request.contextPath}/index.html"> Hamburgueria</a>
             <ul>
                 <li><a href="${pageContext.request.contextPath}${URL_BASE}/CargoController?opcao=listar">Cargo</a></li>
                 <li><a href="${pageContext.request.contextPath}${URL_BASE}/CategoriaController?opcao=listar">Categoria</a></li>
