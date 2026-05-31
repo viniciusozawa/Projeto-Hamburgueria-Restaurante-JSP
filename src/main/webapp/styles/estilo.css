@@ -11,7 +11,7 @@ body {
 }
 
 /* ===== NAVBAR ===== */
-nav {
+/* nav {
     background-color: #2c3e50;
     padding: 0 30px;
     display: flex;
@@ -41,17 +41,17 @@ nav ul li a {
     border-radius: 6px;
     font-size: 14px;
     transition: background 0.2s;
-}
+}*/
 
 nav ul li a:hover,
 nav ul li a.ativo {
     background-color: #f39c12;
     color: #2c3e50;
     font-weight: bold;
-}
+} 
 
 /* ===== CONTAINER ===== */
-.container {
+.containerr {
     width: 90%;
     max-width: 960px;
     margin: 40px auto;
@@ -198,6 +198,8 @@ caption {
     color: #2c3e50;
     text-align: left;
     margin-bottom: 5px;
+    caption-side: top;
+
 }
 
 th {
