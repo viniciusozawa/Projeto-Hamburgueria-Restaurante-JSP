@@ -57,6 +57,24 @@
                                 <i class="fa-solid fa-clock"></i> Turnos
                             </a>
                         </li>
+                        <li class="nav-item px-2">
+                            <a class="nav-link"
+                                href="${pageContext.request.contextPath}${URL_BASE}/FuncionarioController?opcao=listar">
+                                <i class="fa-solid fa-user-tie"></i> Funcionario
+                            </a>
+                        </li>
+                        <li class="nav-item px-2">
+                            <a class="nav-link"
+                                href="${pageContext.request.contextPath}${URL_BASE}/CardapioController?opcao=listar">
+                                <i class="fa-solid fa-utensils"></i> Cardapio
+                            </a>
+                        </li>
+                        <li class="nav-item px-2">
+                            <a class="nav-link"
+                                href="${pageContext.request.contextPath}${URL_BASE}/IngredienteController?opcao=listar">
+                                <i class="fa-solid fa-carrot"></i> Ingrediente
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -85,9 +103,9 @@
                         <table>
                             <caption>Cargos Cadastrados</caption>
                             <tr>
-                                <th>Código</th>
+                                <th>Cï¿½digo</th>
                                 <th>Nome</th>
-                                <th>Ações</th>
+                                <th>Aï¿½ï¿½es</th>
                             </tr>
                             <c:forEach var="item" items="${cargos}">
                                 <tr>

@@ -25,11 +25,13 @@ public class GenericoDAO<T> {
             con = connectionFactory.getConnection();
             pstmt = con.prepareStatement(comandoSql, PreparedStatement.RETURN_GENERATED_KEYS);
             for (int i = 0; i < parametros.length; i++) {
-                if (parametros[i] instanceof Calendar calendar) {
+                if (parametros[i] instanceof Calendar) {
+                    Calendar calendar = (Calendar) parametros[i];
                     pstmt.setTimestamp(i + 1, new java.sql.Timestamp(calendar.getTimeInMillis()));
                 } else {
                     pstmt.setObject(i + 1, parametros[i]);
                 }
+
             }
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {

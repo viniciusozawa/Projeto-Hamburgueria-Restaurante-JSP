@@ -49,6 +49,21 @@
                     <i class="fa-solid fa-clock"></i> Turnos
                 </a>
             </li>
+            <li class="nav-item px-2">
+                <a class="nav-link" href="${pageContext.request.contextPath}${URL_BASE}/FuncionarioController?opcao=listar">
+                    <i class="fa-solid fa-user-tie"></i> Funcionario
+                </a>
+            </li>
+            <li class="nav-item px-2">
+                <a class="nav-link" href="${pageContext.request.contextPath}${URL_BASE}/CardapioController?opcao=listar">
+                    <i class="fa-solid fa-utensils"></i> Cardapio
+                </a>
+            </li>
+            <li class="nav-item px-2">
+                <a class="nav-link" href="${pageContext.request.contextPath}${URL_BASE}/IngredienteController?opcao=listar">
+                    <i class="fa-solid fa-carrot"></i> Ingrediente
+                </a>
+            </li>
         </ul>
     </div>
 </nav>
@@ -61,11 +76,11 @@
         <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}"/>
         <input type="hidden" name="codTurnos" value="${empty codTurnos ? 0 : codTurnos}"/>
         <div class="form-group">
-            <label>Horário Início:</label>
+            <label>Horï¿½rio Inï¿½cio:</label>
             <input type="time" name="horarioInicio" value="${horarioInicio}" required/>
         </div>
         <div class="form-group">
-            <label>Horário Final:</label>
+            <label>Horï¿½rio Final:</label>
             <input type="time" name="horarioFinal" value="${horarioFinal}" required/>
         </div>
         <button type="submit" class="btn-salvar">Salvar</button>
@@ -78,7 +93,7 @@
         <div class="table-wrapper">
             <table>
                 <caption>Turnos Cadastrados</caption>
-                <tr><th>Código</th><th>Início</th><th>Final</th><th>Ações</th></tr>
+                <tr><th>Cï¿½digo</th><th>Inï¿½cio</th><th>Final</th><th>Aï¿½ï¿½es</th></tr>
                 <c:forEach var="item" items="${turnos}">
                     <tr>
                         <td>${item.codTurnos}</td>
