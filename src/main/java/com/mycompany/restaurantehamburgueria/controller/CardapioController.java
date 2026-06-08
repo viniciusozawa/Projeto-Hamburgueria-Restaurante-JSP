@@ -17,19 +17,19 @@ import java.util.List;
 @WebServlet(WebConstante.BASE_PATH + "/CardapioController")
 public class CardapioController extends HttpServlet {
 
-    private final CardapioDao dao = new CardapioDao();
+    private final CardapioDao dao         = new CardapioDao();
     private final CategoriaDao categoriaDao = new CategoriaDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String opcao = request.getParameter("opcao");
+        String opcao     = request.getParameter("opcao");
         if (opcao == null || opcao.isEmpty()) opcao = "listar";
 
-        String codIn        = request.getParameter("codCardapio");
-        String nomeIn       = request.getParameter("nomeComida");
-        String valorIn      = request.getParameter("valorComida");
-        String descricaoIn  = request.getParameter("descricaoComida");
-        String codCatIn     = request.getParameter("codCategoria");
+        String codIn     = request.getParameter("codCardapio");
+        String nomeIn    = request.getParameter("nomeComida");
+        String valorIn   = request.getParameter("valorComida");
+        String descIn    = request.getParameter("descricaoComida");
+        String codCatIn  = request.getParameter("codCategoria");
 
         try {
             switch (opcao) {
@@ -37,22 +37,19 @@ public class CardapioController extends HttpServlet {
                     encaminhar(request, response);
                     break;
                 case "cadastrar":
-                    cadastrar(request, response, nomeIn, valorIn, descricaoIn, codCatIn);
+                    cadastrar(request, response, nomeIn, valorIn, descIn, codCatIn);
                     break;
                 case "enviarAlterar":
-                    enviarAlterar(request, response, codIn, nomeIn, valorIn, descricaoIn, codCatIn);
+                    enviarAlterar(request, response, codIn, nomeIn, valorIn, descIn, codCatIn);
                     break;
                 case "confirmarAlterar":
-                    confirmarAlterar(request, response, codIn, nomeIn, valorIn, descricaoIn, codCatIn);
+                    confirmarAlterar(request, response, codIn, nomeIn, valorIn, descIn, codCatIn);
                     break;
                 case "enviarExcluir":
-                    enviarExcluir(request, response, codIn, nomeIn, valorIn, descricaoIn, codCatIn);
+                    enviarExcluir(request, response, codIn, nomeIn, valorIn, descIn, codCatIn);
                     break;
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
-                    break;
-                case "cancelar":
-                    encaminhar(request, response);
                     break;
                 default:
                     encaminhar(request, response);
@@ -62,32 +59,30 @@ public class CardapioController extends HttpServlet {
         }
     }
 
-    private Cardapio montar(String nome, String valor, String descricao, String codCategoria) {
+    private Cardapio montar(String nome, String valor, String descricao, String codCat) {
         Cardapio obj = new Cardapio();
         obj.setNomeComida(nome);
         if (valor != null && !valor.isEmpty()) obj.setValorComida(Double.valueOf(valor));
         obj.setDescricaoComida(descricao);
-
         Categoria cat = new Categoria();
-        cat.setCodCategoria(Integer.valueOf(codCategoria));
+        cat.setCodCategoria(Integer.valueOf(codCat));
         obj.setCategoriaCardapio(cat);
-
         return obj;
     }
 
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
-            String nome, String valor, String descricao, String codCat) throws ServletException, IOException {
-        dao.salvar(montar(nome, valor, descricao, codCat));
-        req.setAttribute("mensagem", "Cardapio cadastrado com sucesso!");
-        encaminhar(req, res);
+            String nome, String valor, String desc, String codCat) throws IOException {
+        dao.salvar(montar(nome, valor, desc, codCat));
+        req.getSession().setAttribute("flash", "Cardapio cadastrado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CardapioController?opcao=listar");
     }
 
     private void enviarAlterar(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String valor, String descricao, String codCat) throws ServletException, IOException {
+            String cod, String nome, String valor, String desc, String codCat) throws ServletException, IOException {
         req.setAttribute("codCardapio", cod);
         req.setAttribute("nomeComida", nome);
         req.setAttribute("valorComida", valor);
-        req.setAttribute("descricaoComida", descricao);
+        req.setAttribute("descricaoComida", desc);
         req.setAttribute("codCategoriaAtual", Integer.valueOf(codCat));
         req.setAttribute("opcao", "confirmarAlterar");
         req.setAttribute("mensagem", "Edite os dados e clique em Salvar.");
@@ -95,35 +90,40 @@ public class CardapioController extends HttpServlet {
     }
 
     private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String valor, String descricao, String codCat) throws ServletException, IOException {
-        Cardapio obj = montar(nome, valor, descricao, codCat);
+            String cod, String nome, String valor, String desc, String codCat) throws IOException {
+        Cardapio obj = montar(nome, valor, desc, codCat);
         obj.setCodCardapio(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.setAttribute("mensagem", "Cardapio alterado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Cardapio alterado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CardapioController?opcao=listar");
     }
 
     private void enviarExcluir(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String valor, String descricao, String codCat) throws ServletException, IOException {
+            String cod, String nome, String valor, String desc, String codCat) throws ServletException, IOException {
         req.setAttribute("codCardapio", cod);
         req.setAttribute("nomeComida", nome);
         req.setAttribute("valorComida", valor);
-        req.setAttribute("descricaoComida", descricao);
+        req.setAttribute("descricaoComida", desc);
         req.setAttribute("codCategoriaAtual", Integer.valueOf(codCat));
         req.setAttribute("opcao", "confirmarExcluir");
         req.setAttribute("mensagem", "Confirme a exclusao clicando em Salvar.");
         encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Cardapio obj = new Cardapio();
         obj.setCodCardapio(Integer.valueOf(cod));
         dao.excluir(obj);
-        req.setAttribute("mensagem", "Cardapio excluido com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Cardapio excluido com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CardapioController?opcao=listar");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Cardapio> lista = dao.buscarTodos();
         request.setAttribute("cardapios", lista);
         request.setAttribute("categorias", categoriaDao.buscarTodos());

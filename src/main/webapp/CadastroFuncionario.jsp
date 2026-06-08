@@ -8,10 +8,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        select { width:100%; padding:9px 12px; font-size:15px; border-radius:8px; border:1px solid #ccc; }
-        input[type="date"] { width:100%; padding:9px 12px; font-size:15px; border-radius:8px; border:1px solid #ccc; }
-    </style>
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
@@ -78,7 +75,7 @@
             <div class="mensagem">${mensagem}</div>
         </c:if>
 
-        <form method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/FuncionarioController">
+        <form id="formCadastro" method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/FuncionarioController">
             <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}" />
             <input type="hidden" name="codFuncionario" value="${empty codFuncionario ? 0 : codFuncionario}" />
 
@@ -122,13 +119,11 @@
                     </c:forEach>
                 </select>
             </div>
-
-            <button type="submit" class="btn-salvar">Salvar</button>
         </form>
-        <form method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/FuncionarioController">
-            <input type="hidden" name="opcao" value="cancelar" />
-            <button type="submit" class="btn-cancelar">Cancelar</button>
-        </form>
+        <div class="btn-actions">
+            <button type="submit" form="formCadastro" class="btn-salvar">Salvar</button>
+            <a href="${pageContext.request.contextPath}${URL_BASE}/FuncionarioController?opcao=listar" class="btn-cancelar">Cancelar</a>
+        </div>
 
         <c:if test="${not empty funcionarios}">
             <div class="table-wrapper">

@@ -20,23 +20,23 @@ import java.util.List;
 @WebServlet(WebConstante.BASE_PATH + "/FuncionarioController")
 public class FuncionarioController extends HttpServlet {
 
-    private final FuncionarioDao dao = new FuncionarioDao();
-    private final CargoDao cargoDao = new CargoDao();
-    private final TurnosDao turnosDao = new TurnosDao();
+    private final FuncionarioDao dao      = new FuncionarioDao();
+    private final CargoDao cargoDao       = new CargoDao();
+    private final TurnosDao turnosDao     = new TurnosDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String opcao = request.getParameter("opcao");
+        String opcao       = request.getParameter("opcao");
         if (opcao == null || opcao.isEmpty()) opcao = "listar";
 
-        String codIn        = request.getParameter("codFuncionario");
-        String nomeIn       = request.getParameter("nomeFuncionario");
-        String nascIn       = request.getParameter("dataNascimento");
-        String senhaIn      = request.getParameter("senhaFuncionario");
-        String cpfIn        = request.getParameter("cpfFuncionario");
-        String salarioIn    = request.getParameter("salarioFuncionario");
-        String codTurnosIn  = request.getParameter("codTurnos");
-        String codCargoIn   = request.getParameter("codCargo");
+        String codIn       = request.getParameter("codFuncionario");
+        String nomeIn      = request.getParameter("nomeFuncionario");
+        String nascIn      = request.getParameter("dataNascimento");
+        String senhaIn     = request.getParameter("senhaFuncionario");
+        String cpfIn       = request.getParameter("cpfFuncionario");
+        String salarioIn   = request.getParameter("salarioFuncionario");
+        String codTurnosIn = request.getParameter("codTurnos");
+        String codCargoIn  = request.getParameter("codCargo");
 
         try {
             switch (opcao) {
@@ -58,9 +58,6 @@ public class FuncionarioController extends HttpServlet {
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
                     break;
-                case "cancelar":
-                    encaminhar(request, response);
-                    break;
                 default:
                     encaminhar(request, response);
             }
@@ -76,29 +73,20 @@ public class FuncionarioController extends HttpServlet {
         obj.setSenhaFuncionario(senha);
         obj.setCpfFuncionario(cpf);
         if (salario != null && !salario.isEmpty()) obj.setSalarioFuncionario(Double.valueOf(salario));
-
-        Turnos turnos = new Turnos();
-        turnos.setCodTurnos(Integer.valueOf(codTurnos));
-        obj.setTurnosFuncionario(turnos);
-
-        Cargo cargo = new Cargo();
-        cargo.setCodCargo(Integer.valueOf(codCargo));
-        obj.setCargoFuncionario(cargo);
-
+        Turnos t = new Turnos(); t.setCodTurnos(Integer.valueOf(codTurnos)); obj.setTurnosFuncionario(t);
+        Cargo c = new Cargo(); c.setCodCargo(Integer.valueOf(codCargo)); obj.setCargoFuncionario(c);
         return obj;
     }
 
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
-            String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo)
-            throws ServletException, IOException {
+            String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo) throws IOException {
         dao.salvar(montar(nome, nasc, senha, cpf, salario, codTurnos, codCargo));
-        req.setAttribute("mensagem", "Funcionario cadastrado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Funcionario cadastrado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FuncionarioController?opcao=listar");
     }
 
     private void enviarAlterar(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo)
-            throws ServletException, IOException {
+            String cod, String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo) throws ServletException, IOException {
         req.setAttribute("codFuncionario", cod);
         req.setAttribute("nomeFuncionario", nome);
         req.setAttribute("dataNascimento", nasc);
@@ -113,18 +101,16 @@ public class FuncionarioController extends HttpServlet {
     }
 
     private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo)
-            throws ServletException, IOException {
+            String cod, String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo) throws IOException {
         Funcionario obj = montar(nome, nasc, senha, cpf, salario, codTurnos, codCargo);
         obj.setCodFuncionario(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.setAttribute("mensagem", "Funcionario alterado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Funcionario alterado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FuncionarioController?opcao=listar");
     }
 
     private void enviarExcluir(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo)
-            throws ServletException, IOException {
+            String cod, String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo) throws ServletException, IOException {
         req.setAttribute("codFuncionario", cod);
         req.setAttribute("nomeFuncionario", nome);
         req.setAttribute("dataNascimento", nasc);
@@ -138,15 +124,20 @@ public class FuncionarioController extends HttpServlet {
         encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Funcionario obj = new Funcionario();
         obj.setCodFuncionario(Integer.valueOf(cod));
         dao.excluir(obj);
-        req.setAttribute("mensagem", "Funcionario excluido com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Funcionario excluido com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FuncionarioController?opcao=listar");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Funcionario> lista = dao.buscarTodos();
         request.setAttribute("funcionarios", lista);
         request.setAttribute("cargos", cargoDao.buscarTodos());

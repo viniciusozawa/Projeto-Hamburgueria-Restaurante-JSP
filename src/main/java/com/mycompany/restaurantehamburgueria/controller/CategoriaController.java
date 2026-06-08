@@ -19,16 +19,16 @@ public class CategoriaController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String opcao = request.getParameter("opcao");
+        String opcao  = request.getParameter("opcao");
         if (opcao == null || opcao.isEmpty()) opcao = "listar";
 
-        String codIn = request.getParameter("codCategoria");
+        String codIn  = request.getParameter("codCategoria");
         String nomeIn = request.getParameter("nomeCategoria");
 
         try {
             switch (opcao) {
                 case "listar":
-                    encaminhar(request, response, null);
+                    encaminhar(request, response);
                     break;
                 case "cadastrar":
                     cadastrar(request, response, nomeIn);
@@ -45,62 +45,63 @@ public class CategoriaController extends HttpServlet {
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
                     break;
-                case "cancelar":
-                    encaminhar(request, response, null);
-                    break;
                 default:
-                    encaminhar(request, response, null);
+                    encaminhar(request, response);
             }
         } catch (Exception e) {
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
 
-    private void cadastrar(HttpServletRequest request, HttpServletResponse response, String nome) throws ServletException, IOException {
+    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String nome) throws IOException {
         Categoria obj = new Categoria();
         obj.setNomeCategoria(nome);
         dao.salvar(obj);
-        request.setAttribute("mensagem", "Categoria cadastrada com sucesso!");
-        encaminhar(request, response, null);
+        req.getSession().setAttribute("flash", "Categoria cadastrada com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CategoriaController?opcao=listar");
     }
 
-    private void enviarAlterar(HttpServletRequest request, HttpServletResponse response, String cod, String nome) throws ServletException, IOException {
-        request.setAttribute("codCategoria", cod);
-        request.setAttribute("nomeCategoria", nome);
-        request.setAttribute("opcao", "confirmarAlterar");
-        request.setAttribute("mensagem", "Edite os dados e clique em Salvar.");
-        encaminhar(request, response, null);
+    private void enviarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome) throws ServletException, IOException {
+        req.setAttribute("codCategoria", cod);
+        req.setAttribute("nomeCategoria", nome);
+        req.setAttribute("opcao", "confirmarAlterar");
+        req.setAttribute("mensagem", "Edite os dados e clique em Salvar.");
+        encaminhar(req, res);
     }
 
-    private void confirmarAlterar(HttpServletRequest request, HttpServletResponse response, String cod, String nome) throws ServletException, IOException {
+    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome) throws IOException {
         Categoria obj = new Categoria();
         obj.setCodCategoria(Integer.valueOf(cod));
         obj.setNomeCategoria(nome);
         dao.alterar(obj);
-        request.setAttribute("mensagem", "Categoria alterada com sucesso!");
-        encaminhar(request, response, null);
+        req.getSession().setAttribute("flash", "Categoria alterada com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CategoriaController?opcao=listar");
     }
 
-    private void enviarExcluir(HttpServletRequest request, HttpServletResponse response, String cod, String nome) throws ServletException, IOException {
-        request.setAttribute("codCategoria", cod);
-        request.setAttribute("nomeCategoria", nome);
-        request.setAttribute("opcao", "confirmarExcluir");
-        request.setAttribute("mensagem", "Confirme a exclusão clicando em Salvar.");
-        encaminhar(request, response, null);
+    private void enviarExcluir(HttpServletRequest req, HttpServletResponse res, String cod, String nome) throws ServletException, IOException {
+        req.setAttribute("codCategoria", cod);
+        req.setAttribute("nomeCategoria", nome);
+        req.setAttribute("opcao", "confirmarExcluir");
+        req.setAttribute("mensagem", "Confirme a exclusao clicando em Salvar.");
+        encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest request, HttpServletResponse response, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Categoria obj = new Categoria();
         obj.setCodCategoria(Integer.valueOf(cod));
         dao.excluir(obj);
-        request.setAttribute("mensagem", "Categoria excluída com sucesso!");
-        encaminhar(request, response, null);
+        req.getSession().setAttribute("flash", "Categoria excluida com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CategoriaController?opcao=listar");
     }
 
-    private void encaminhar(HttpServletRequest request, HttpServletResponse response, String msg) throws ServletException, IOException {
+    private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Categoria> lista = dao.buscarTodos();
         request.setAttribute("categorias", lista);
-        if (msg != null) request.setAttribute("mensagem", msg);
         RequestDispatcher rd = request.getRequestDispatcher("/CadastroCategoria.jsp");
         rd.forward(request, response);
     }

@@ -18,12 +18,12 @@ import java.util.List;
 @WebServlet(WebConstante.BASE_PATH + "/IngredienteController")
 public class IngredienteController extends HttpServlet {
 
-    private final IngredienteDao dao = new IngredienteDao();
+    private final IngredienteDao dao        = new IngredienteDao();
     private final FornecedorDao fornecedorDao = new FornecedorDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String opcao = request.getParameter("opcao");
+        String opcao        = request.getParameter("opcao");
         if (opcao == null || opcao.isEmpty()) opcao = "listar";
 
         String codIn        = request.getParameter("codIngrediente");
@@ -55,9 +55,6 @@ public class IngredienteController extends HttpServlet {
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
                     break;
-                case "cancelar":
-                    encaminhar(request, response);
-                    break;
                 default:
                     encaminhar(request, response);
             }
@@ -66,40 +63,34 @@ public class IngredienteController extends HttpServlet {
         }
     }
 
-    private Ingrediente montar(String nome, String quanti, String producao, String vencimento, String valor, String descricao, String codForn) {
+    private Ingrediente montar(String nome, String quanti, String producao, String vencimento, String valor, String desc, String codForn) {
         Ingrediente obj = new Ingrediente();
         obj.setNomeIngredientes(nome);
         if (quanti != null && !quanti.isEmpty()) obj.setQuantiIngredientes(Double.valueOf(quanti));
         if (producao != null && !producao.isEmpty()) obj.setDataProducao(LocalDate.parse(producao));
         if (vencimento != null && !vencimento.isEmpty()) obj.setDataVencimento(LocalDate.parse(vencimento));
         if (valor != null && !valor.isEmpty()) obj.setValorIngrediente(Double.valueOf(valor));
-        obj.setDescricaoIngrediente(descricao);
-
-        Fornecedor forn = new Fornecedor();
-        forn.setCodFornecedor(Integer.valueOf(codForn));
-        obj.setFornecedorIngrediente(forn);
-
+        obj.setDescricaoIngrediente(desc);
+        Fornecedor f = new Fornecedor(); f.setCodFornecedor(Integer.valueOf(codForn)); obj.setFornecedorIngrediente(f);
         return obj;
     }
 
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
-            String nome, String quanti, String producao, String vencimento, String valor, String descricao, String codForn)
-            throws ServletException, IOException {
-        dao.salvar(montar(nome, quanti, producao, vencimento, valor, descricao, codForn));
-        req.setAttribute("mensagem", "Ingrediente cadastrado com sucesso!");
-        encaminhar(req, res);
+            String nome, String quanti, String producao, String vencimento, String valor, String desc, String codForn) throws IOException {
+        dao.salvar(montar(nome, quanti, producao, vencimento, valor, desc, codForn));
+        req.getSession().setAttribute("flash", "Ingrediente cadastrado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/IngredienteController?opcao=listar");
     }
 
     private void enviarAlterar(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String quanti, String producao, String vencimento, String valor, String descricao, String codForn)
-            throws ServletException, IOException {
+            String cod, String nome, String quanti, String producao, String vencimento, String valor, String desc, String codForn) throws ServletException, IOException {
         req.setAttribute("codIngrediente", cod);
         req.setAttribute("nomeIngredientes", nome);
         req.setAttribute("quantiIngredientes", quanti);
         req.setAttribute("dataProducao", producao);
         req.setAttribute("dataVencimento", vencimento);
         req.setAttribute("valorIngrediente", valor);
-        req.setAttribute("descricaoIngrediente", descricao);
+        req.setAttribute("descricaoIngrediente", desc);
         req.setAttribute("codFornecedorAtual", Integer.valueOf(codForn));
         req.setAttribute("opcao", "confirmarAlterar");
         req.setAttribute("mensagem", "Edite os dados e clique em Salvar.");
@@ -107,40 +98,43 @@ public class IngredienteController extends HttpServlet {
     }
 
     private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String quanti, String producao, String vencimento, String valor, String descricao, String codForn)
-            throws ServletException, IOException {
-        Ingrediente obj = montar(nome, quanti, producao, vencimento, valor, descricao, codForn);
+            String cod, String nome, String quanti, String producao, String vencimento, String valor, String desc, String codForn) throws IOException {
+        Ingrediente obj = montar(nome, quanti, producao, vencimento, valor, desc, codForn);
         obj.setCodIngrediente(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.setAttribute("mensagem", "Ingrediente alterado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Ingrediente alterado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/IngredienteController?opcao=listar");
     }
 
     private void enviarExcluir(HttpServletRequest req, HttpServletResponse res,
-            String cod, String nome, String quanti, String producao, String vencimento, String valor, String descricao, String codForn)
-            throws ServletException, IOException {
+            String cod, String nome, String quanti, String producao, String vencimento, String valor, String desc, String codForn) throws ServletException, IOException {
         req.setAttribute("codIngrediente", cod);
         req.setAttribute("nomeIngredientes", nome);
         req.setAttribute("quantiIngredientes", quanti);
         req.setAttribute("dataProducao", producao);
         req.setAttribute("dataVencimento", vencimento);
         req.setAttribute("valorIngrediente", valor);
-        req.setAttribute("descricaoIngrediente", descricao);
+        req.setAttribute("descricaoIngrediente", desc);
         req.setAttribute("codFornecedorAtual", Integer.valueOf(codForn));
         req.setAttribute("opcao", "confirmarExcluir");
         req.setAttribute("mensagem", "Confirme a exclusao clicando em Salvar.");
         encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Ingrediente obj = new Ingrediente();
         obj.setCodIngrediente(Integer.valueOf(cod));
         dao.excluir(obj);
-        req.setAttribute("mensagem", "Ingrediente excluido com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Ingrediente excluido com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/IngredienteController?opcao=listar");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Ingrediente> lista = dao.buscarTodos();
         request.setAttribute("ingredientes", lista);
         request.setAttribute("fornecedores", fornecedorDao.buscarTodos());

@@ -19,7 +19,7 @@ public class FornecedorController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String opcao = request.getParameter("opcao");
+        String opcao    = request.getParameter("opcao");
         if (opcao == null || opcao.isEmpty()) opcao = "listar";
 
         String codIn    = request.getParameter("codFornecedor");
@@ -50,9 +50,6 @@ public class FornecedorController extends HttpServlet {
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
                     break;
-                case "cancelar":
-                    encaminhar(request, response);
-                    break;
                 default:
                     encaminhar(request, response);
             }
@@ -72,10 +69,10 @@ public class FornecedorController extends HttpServlet {
         return obj;
     }
 
-    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String nome, String cnpj, String end, String bairro, String cidade, String estado) throws ServletException, IOException {
+    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String nome, String cnpj, String end, String bairro, String cidade, String estado) throws IOException {
         dao.salvar(montar(nome, cnpj, end, bairro, cidade, estado));
-        req.setAttribute("mensagem", "Fornecedor cadastrado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Fornecedor cadastrado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FornecedorController?opcao=listar");
     }
 
     private void enviarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cnpj, String end, String bairro, String cidade, String estado) throws ServletException, IOException {
@@ -91,12 +88,12 @@ public class FornecedorController extends HttpServlet {
         encaminhar(req, res);
     }
 
-    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cnpj, String end, String bairro, String cidade, String estado) throws ServletException, IOException {
+    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cnpj, String end, String bairro, String cidade, String estado) throws IOException {
         Fornecedor obj = montar(nome, cnpj, end, bairro, cidade, estado);
         obj.setCodFornecedor(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.setAttribute("mensagem", "Fornecedor alterado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Fornecedor alterado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FornecedorController?opcao=listar");
     }
 
     private void enviarExcluir(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cnpj, String end, String bairro, String cidade, String estado) throws ServletException, IOException {
@@ -108,19 +105,24 @@ public class FornecedorController extends HttpServlet {
         req.setAttribute("cidade", cidade);
         req.setAttribute("estado", estado);
         req.setAttribute("opcao", "confirmarExcluir");
-        req.setAttribute("mensagem", "Confirme a exclusão clicando em Salvar.");
+        req.setAttribute("mensagem", "Confirme a exclusao clicando em Salvar.");
         encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Fornecedor obj = new Fornecedor();
         obj.setCodFornecedor(Integer.valueOf(cod));
         dao.excluir(obj);
-        req.setAttribute("mensagem", "Fornecedor excluído com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Fornecedor excluido com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FornecedorController?opcao=listar");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Fornecedor> lista = dao.buscarTodos();
         request.setAttribute("fornecedores", lista);
         RequestDispatcher rd = request.getRequestDispatcher("/CadastroFornecedor.jsp");

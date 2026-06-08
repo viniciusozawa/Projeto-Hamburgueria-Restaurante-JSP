@@ -19,12 +19,12 @@ public class MesaController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String opcao   = request.getParameter("opcao");
+        String opcao  = request.getParameter("opcao");
         if (opcao == null || opcao.isEmpty()) opcao = "listar";
 
-        String codIn    = request.getParameter("codMesa");
-        String numIn    = request.getParameter("numeroMesa");
-        String localIn  = request.getParameter("localMesa");
+        String codIn   = request.getParameter("codMesa");
+        String numIn   = request.getParameter("numeroMesa");
+        String localIn = request.getParameter("localMesa");
 
         try {
             switch (opcao) {
@@ -46,9 +46,6 @@ public class MesaController extends HttpServlet {
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
                     break;
-                case "cancelar":
-                    encaminhar(request, response);
-                    break;
                 default:
                     encaminhar(request, response);
             }
@@ -57,13 +54,13 @@ public class MesaController extends HttpServlet {
         }
     }
 
-    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String num, String local) throws ServletException, IOException {
+    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String num, String local) throws IOException {
         Mesa obj = new Mesa();
         obj.setNumeroMesa(Integer.valueOf(num));
         obj.setLocalMesa(local);
         dao.salvar(obj);
-        req.setAttribute("mensagem", "Mesa cadastrada com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Mesa cadastrada com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/MesaController?opcao=listar");
     }
 
     private void enviarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String num, String local) throws ServletException, IOException {
@@ -75,14 +72,14 @@ public class MesaController extends HttpServlet {
         encaminhar(req, res);
     }
 
-    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String num, String local) throws ServletException, IOException {
+    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String num, String local) throws IOException {
         Mesa obj = new Mesa();
         obj.setCodMesa(Integer.valueOf(cod));
         obj.setNumeroMesa(Integer.valueOf(num));
         obj.setLocalMesa(local);
         dao.alterar(obj);
-        req.setAttribute("mensagem", "Mesa alterada com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Mesa alterada com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/MesaController?opcao=listar");
     }
 
     private void enviarExcluir(HttpServletRequest req, HttpServletResponse res, String cod, String num, String local) throws ServletException, IOException {
@@ -90,19 +87,24 @@ public class MesaController extends HttpServlet {
         req.setAttribute("numeroMesa", num);
         req.setAttribute("localMesa", local);
         req.setAttribute("opcao", "confirmarExcluir");
-        req.setAttribute("mensagem", "Confirme a exclusão clicando em Salvar.");
+        req.setAttribute("mensagem", "Confirme a exclusao clicando em Salvar.");
         encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Mesa obj = new Mesa();
         obj.setCodMesa(Integer.valueOf(cod));
         dao.excluir(obj);
-        req.setAttribute("mensagem", "Mesa excluída com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Mesa excluida com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/MesaController?opcao=listar");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Mesa> lista = dao.buscarTodos();
         request.setAttribute("mesas", lista);
         RequestDispatcher rd = request.getRequestDispatcher("/CadastroMesa.jsp");

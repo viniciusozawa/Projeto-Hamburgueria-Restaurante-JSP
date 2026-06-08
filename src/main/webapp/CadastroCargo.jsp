@@ -83,7 +83,7 @@
                 <c:if test="${not empty mensagem}">
                     <div class="mensagem">${mensagem}</div>
                 </c:if>
-                <form method="get"
+                <form id="formCadastro" method="get"
                     action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/CargoController">
                     <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}" />
                     <input type="hidden" name="codCargo" value="${empty codCargo ? 0 : codCargo}" />
@@ -91,13 +91,11 @@
                         <label>Nome do Cargo:</label>
                         <input type="text" name="nomeCargo" value="${nomeCargo}" required />
                     </div>
-                    <button type="submit" class="btn-salvar" name="btn">Salvar</button>
                 </form>
-                <form method="get"
-                    action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/CargoController">
-                    <input type="hidden" name="opcao" value="cancelar" />
-                    <button type="submit" class="btn-cancelar">Cancelar</button>
-                </form>
+                <div class="btn-actions">
+                    <button type="submit" form="formCadastro" class="btn-salvar">Salvar</button>
+                    <a href="${pageContext.request.contextPath}${URL_BASE}/CargoController?opcao=listar" class="btn-cancelar">Cancelar</a>
+                </div>
                 <c:if test="${not empty cargos}">
                     <div class="table-wrapper">
                         <table>

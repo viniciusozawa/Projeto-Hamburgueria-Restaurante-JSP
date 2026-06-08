@@ -72,7 +72,7 @@
     <c:if test="${not empty mensagem}">
         <div class="mensagem">${mensagem}</div>
     </c:if>
-    <form method="get" action="${pageContext.request.contextPath}${URL_BASE}/TurnosController">
+    <form id="formCadastro" method="get" action="${pageContext.request.contextPath}${URL_BASE}/TurnosController">
         <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}"/>
         <input type="hidden" name="codTurnos" value="${empty codTurnos ? 0 : codTurnos}"/>
         <div class="form-group">
@@ -83,12 +83,11 @@
             <label>Hor�rio Final:</label>
             <input type="time" name="horarioFinal" value="${horarioFinal}" required/>
         </div>
-        <button type="submit" class="btn-salvar">Salvar</button>
     </form>
-    <form method="get" action="${pageContext.request.contextPath}${URL_BASE}/TurnosController">
-        <input type="hidden" name="opcao" value="cancelar"/>
-        <button type="submit" class="btn-cancelar">Cancelar</button>
-    </form>
+    <div class="btn-actions">
+        <button type="submit" form="formCadastro" class="btn-salvar">Salvar</button>
+        <a href="${pageContext.request.contextPath}${URL_BASE}/TurnosController?opcao=listar" class="btn-cancelar">Cancelar</a>
+    </div>
     <c:if test="${not empty turnos}">
         <div class="table-wrapper">
             <table>

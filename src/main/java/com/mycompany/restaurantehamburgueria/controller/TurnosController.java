@@ -47,9 +47,6 @@ public class TurnosController extends HttpServlet {
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
                     break;
-                case "cancelar":
-                    encaminhar(request, response);
-                    break;
                 default:
                     encaminhar(request, response);
             }
@@ -65,10 +62,10 @@ public class TurnosController extends HttpServlet {
         return obj;
     }
 
-    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String inicio, String fim) throws ServletException, IOException {
+    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String inicio, String fim) throws IOException {
         dao.salvar(montar(inicio, fim));
-        req.setAttribute("mensagem", "Turno cadastrado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Turno cadastrado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/TurnosController?opcao=listar");
     }
 
     private void enviarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String inicio, String fim) throws ServletException, IOException {
@@ -80,12 +77,12 @@ public class TurnosController extends HttpServlet {
         encaminhar(req, res);
     }
 
-    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String inicio, String fim) throws ServletException, IOException {
+    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String inicio, String fim) throws IOException {
         Turnos obj = montar(inicio, fim);
         obj.setCodTurnos(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.setAttribute("mensagem", "Turno alterado com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Turno alterado com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/TurnosController?opcao=listar");
     }
 
     private void enviarExcluir(HttpServletRequest req, HttpServletResponse res, String cod, String inicio, String fim) throws ServletException, IOException {
@@ -93,19 +90,24 @@ public class TurnosController extends HttpServlet {
         req.setAttribute("horarioInicio", inicio);
         req.setAttribute("horarioFinal", fim);
         req.setAttribute("opcao", "confirmarExcluir");
-        req.setAttribute("mensagem", "Confirme a exclusão clicando em Salvar.");
+        req.setAttribute("mensagem", "Confirme a exclusao clicando em Salvar.");
         encaminhar(req, res);
     }
 
-    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws ServletException, IOException {
+    private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Turnos obj = new Turnos();
         obj.setCodTurnos(Integer.valueOf(cod));
         dao.excluir(obj);
-        req.setAttribute("mensagem", "Turno excluído com sucesso!");
-        encaminhar(req, res);
+        req.getSession().setAttribute("flash", "Turno excluido com sucesso!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/TurnosController?opcao=listar");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String flash = (String) request.getSession().getAttribute("flash");
+        if (flash != null) {
+            if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
+            request.getSession().removeAttribute("flash");
+        }
         List<Turnos> lista = dao.buscarTodos();
         request.setAttribute("turnos", lista);
         RequestDispatcher rd = request.getRequestDispatcher("/CadastroTurnos.jsp");
