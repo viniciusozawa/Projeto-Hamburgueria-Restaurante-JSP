@@ -2,110 +2,201 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Hamburgueria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Tites — Sistema de Gerenciamento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="styles/estilo.css">
-    <style>
-        .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 30px; }
-        .card { background: #f4f6f8; border-radius: 12px; padding: 24px 30px; text-align: center; width: 150px; text-decoration: none; color: #2c3e50; box-shadow: 0 3px 10px rgba(0,0,0,0.08); transition: 0.2s; }
-        .card:hover { background: #f39c12; color: white; transform: translateY(-4px); }
-        .card .icon { font-size: 32px; margin-bottom: 10px; }
-        .card span { font-weight: bold; font-size: 14px; }
-        .hero { text-align: center; padding: 20px 0 10px; color: #666; font-size: 15px; }
-    </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- index.html -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-    <a class="navbar-brand" href="index.html"><i class="fa-solid fa-burger"></i> Hamburgueria</a>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark px-4" id="mainNav">
+    <a class="navbar-brand fw-bold" href="index.html">
+        <i class="fa-solid fa-burger me-1"></i> Big Tites
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="menuNav">
-    <ul class="navbar-nav ms-auto">
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/CargoController?opcao=listar">
-                <i class="fa-solid fa-id-badge"></i> Cargo
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/CategoriaController?opcao=listar">
-                <i class="fa-solid fa-tags"></i> Categoria
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/ClienteController?opcao=listar">
-                <i class="fa-solid fa-user"></i> Cliente
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/FornecedorController?opcao=listar">
-                <i class="fa-solid fa-truck"></i> Fornecedor
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/MesaController?opcao=listar">
-                <i class="fa-solid fa-chair"></i> Mesa
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/TurnosController?opcao=listar">
-                <i class="fa-solid fa-clock"></i> Turnos
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/FuncionarioController?opcao=listar">
-                <i class="fa-solid fa-user-tie"></i> Funcionario
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/CardapioController?opcao=listar">
-                <i class="fa-solid fa-utensils"></i> Cardapio
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/IngredienteController?opcao=listar">
-                <i class="fa-solid fa-carrot"></i> Ingrediente
-            </a>
-        </li>
-    </ul>
-</div>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/CargoController?opcao=listar">
+                    <i class="fa-solid fa-id-badge me-1"></i>Cargo
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/CategoriaController?opcao=listar">
+                    <i class="fa-solid fa-tags me-1"></i>Categoria
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/ClienteController?opcao=listar">
+                    <i class="fa-solid fa-user me-1"></i>Cliente
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/FornecedorController?opcao=listar">
+                    <i class="fa-solid fa-truck me-1"></i>Fornecedor
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/MesaController?opcao=listar">
+                    <i class="fa-solid fa-chair me-1"></i>Mesa
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/TurnosController?opcao=listar">
+                    <i class="fa-solid fa-clock me-1"></i>Turnos
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/FuncionarioController?opcao=listar">
+                    <i class="fa-solid fa-user-tie me-1"></i>Funcionário
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/CardapioController?opcao=listar">
+                    <i class="fa-solid fa-utensils me-1"></i>Cardápio
+                </a>
+            </li>
+            <li class="nav-item px-1">
+                <a class="nav-link" href="com/mycompany/restaurantehamburgueria/controller/IngredienteController?opcao=listar">
+                    <i class="fa-solid fa-carrot me-1"></i>Ingrediente
+                </a>
+            </li>
+        </ul>
+    </div>
 </nav>
-<div class="containerr">
-    <h1>Sistema de Gerenciamento</h1>
-    <p class="hero">Selecione um módulo para gerenciar os cadastros</p>
-    <div class="cards">
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/CargoController?opcao=listar">
-            <div class="icon">👔</div><span>Cargo</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/CategoriaController?opcao=listar">
-            <div class="icon">🏷️</div><span>Categoria</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/ClienteController?opcao=listar">
-            <div class="icon">👤</div><span>Cliente</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/FornecedorController?opcao=listar">
-            <div class="icon">🚚</div><span>Fornecedor</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/MesaController?opcao=listar">
-            <div class="icon">🪑</div><span>Mesa</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/TurnosController?opcao=listar">
-            <div class="icon">🕐</div><span>Turnos</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/FuncionarioController?opcao=listar">
-            <div class="icon"><i class="fa-solid fa-user-tie"></i></div><span>Funcionario</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/CardapioController?opcao=listar">
-            <div class="icon"><i class="fa-solid fa-utensils"></i></div><span>Cardapio</span>
-        </a>
-        <a class="card" href="com/mycompany/restaurantehamburgueria/controller/IngredienteController?opcao=listar">
-            <div class="icon"><i class="fa-solid fa-carrot"></i></div><span>Ingrediente</span>
+
+<!-- ===== HERO ===== -->
+<section class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <div class="hero-logo">
+            <i class="fa-solid fa-burger"></i>
+        </div>
+        <h1 class="hero-title"><span class="accent">Big</span> Tites</h1>
+        <p class="hero-sub">Sistema completo de gerenciamento para sua hamburgueria — cadastros, estoque, cardápio e muito mais.</p>
+        <a href="#modulos" class="btn btn-warning btn-lg px-5 fw-bold rounded-pill">
+            <i class="fa-solid fa-rocket me-2"></i>Acessar Sistema
         </a>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+</section>
 
+<!-- ===== STATS BAR ===== -->
+<div class="stats-bar">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col stat-item">
+                <div class="stat-num">9</div>
+                <div class="stat-label">Módulos</div>
+            </div>
+            <div class="col stat-item">
+                <div class="stat-num"><i class="fa-solid fa-database" style="font-size:1.4rem; color:var(--primary)"></i></div>
+                <div class="stat-label">CRUD Completo</div>
+            </div>
+            <div class="col stat-item">
+                <div class="stat-num"><i class="fa-solid fa-link" style="font-size:1.4rem; color:var(--primary)"></i></div>
+                <div class="stat-label">Relacionamentos</div>
+            </div>
+            <div class="col stat-item">
+                <div class="stat-num"><i class="fa-solid fa-mobile-screen" style="font-size:1.4rem; color:var(--primary)"></i></div>
+                <div class="stat-label">Responsivo</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MÓDULOS ===== -->
+<section class="modules-section" id="modulos">
+    <h2 class="section-title"><i class="fa-solid fa-table-cells-large me-2"></i>Módulos do Sistema</h2>
+    <p class="section-sub">Selecione um módulo para gerenciar os cadastros da hamburgueria</p>
+
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 g-3">
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/CargoController?opcao=listar">
+                <i class="fa-solid fa-id-badge mod-icon"></i>
+                <span class="mod-name">Cargo</span>
+                <span class="mod-desc">Funções e cargos</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/CategoriaController?opcao=listar">
+                <i class="fa-solid fa-tags mod-icon"></i>
+                <span class="mod-name">Categoria</span>
+                <span class="mod-desc">Categorias de pratos</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/ClienteController?opcao=listar">
+                <i class="fa-solid fa-users mod-icon"></i>
+                <span class="mod-name">Cliente</span>
+                <span class="mod-desc">Base de clientes</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/FornecedorController?opcao=listar">
+                <i class="fa-solid fa-truck mod-icon"></i>
+                <span class="mod-name">Fornecedor</span>
+                <span class="mod-desc">Parceiros e fornecedores</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/MesaController?opcao=listar">
+                <i class="fa-solid fa-chair mod-icon"></i>
+                <span class="mod-name">Mesa</span>
+                <span class="mod-desc">Layout do salão</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/TurnosController?opcao=listar">
+                <i class="fa-solid fa-clock mod-icon"></i>
+                <span class="mod-name">Turnos</span>
+                <span class="mod-desc">Horários de trabalho</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/FuncionarioController?opcao=listar">
+                <i class="fa-solid fa-user-tie mod-icon"></i>
+                <span class="mod-name">Funcionário</span>
+                <span class="mod-desc">Equipe e colaboradores</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/CardapioController?opcao=listar">
+                <i class="fa-solid fa-utensils mod-icon"></i>
+                <span class="mod-name">Cardápio</span>
+                <span class="mod-desc">Pratos e preços</span>
+            </a>
+        </div>
+
+        <div class="col">
+            <a class="module-card" href="com/mycompany/restaurantehamburgueria/controller/IngredienteController?opcao=listar">
+                <i class="fa-solid fa-carrot mod-icon"></i>
+                <span class="mod-name">Ingrediente</span>
+                <span class="mod-desc">Estoque e insumos</span>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <i class="fa-solid fa-burger me-1"></i>
+    <span class="brand">Big Tites</span> &copy; 2024 &mdash; Sistema de Gerenciamento
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
