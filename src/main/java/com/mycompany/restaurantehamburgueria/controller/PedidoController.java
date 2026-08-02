@@ -1,13 +1,17 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.CardapioDao;
 import com.mycompany.restaurantehamburgueria.model.dao.ClienteDao;
 import com.mycompany.restaurantehamburgueria.model.dao.FuncionarioDao;
 import com.mycompany.restaurantehamburgueria.model.dao.MesaDao;
 import com.mycompany.restaurantehamburgueria.model.dao.PedidoDao;
+import com.mycompany.restaurantehamburgueria.model.dao.PedidoPorCardapioDao;
+import com.mycompany.restaurantehamburgueria.model.entity.Cardapio;
 import com.mycompany.restaurantehamburgueria.model.entity.Cliente;
 import com.mycompany.restaurantehamburgueria.model.entity.Funcionario;
 import com.mycompany.restaurantehamburgueria.model.entity.Mesa;
 import com.mycompany.restaurantehamburgueria.model.entity.Pedido;
+import com.mycompany.restaurantehamburgueria.model.entity.PedidoPorCardapio;
 import com.mycompany.restaurantehamburgueria.service.WebConstante;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -25,6 +29,8 @@ public class PedidoController extends HttpServlet {
     private final ClienteDao clienteDao     = new ClienteDao();
     private final MesaDao mesaDao           = new MesaDao();
     private final FuncionarioDao funcionarioDao = new FuncionarioDao();
+    private final CardapioDao cardapioDao   = new CardapioDao();
+    private final PedidoPorCardapioDao itemDao = new PedidoPorCardapioDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -35,6 +41,9 @@ public class PedidoController extends HttpServlet {
         String codClienteIn = request.getParameter("codCliente");
         String codMesaIn    = request.getParameter("codMesa");
         String codFuncIn    = request.getParameter("codFuncionario");
+        String codCardapioIn = request.getParameter("codCardapio");
+        String quantidadeIn = request.getParameter("quantidade");
+        String codItemIn    = request.getParameter("codItem");
 
         try {
             switch (opcao) {
@@ -55,6 +64,15 @@ public class PedidoController extends HttpServlet {
                     break;
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
+                    break;
+                case "abrirItens":
+                    abrirItens(request, response, codIn);
+                    break;
+                case "adicionarItem":
+                    adicionarItem(request, response, codIn, codCardapioIn, quantidadeIn);
+                    break;
+                case "removerItem":
+                    removerItem(request, response, codIn, codItemIn);
                     break;
                 default:
                     encaminhar(request, response);
@@ -118,12 +136,62 @@ public class PedidoController extends HttpServlet {
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/PedidoController?opcao=listar");
     }
 
-    private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // ---------- Itens do pedido (pedido_por_cardapio) ----------
+
+    /** Abre a tela dedicada com os itens do pedido (ItensPedido.jsp). */
+    private void abrirItens(HttpServletRequest req, HttpServletResponse res, String cod)
+            throws ServletException, IOException {
+        int codpedido = Integer.parseInt(cod);
+        Pedido pedido = dao.buscarPorId(codpedido);
+
+        if (pedido == null) {
+            req.getSession().setAttribute("flash", "Pedido nao encontrado.");
+            res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/PedidoController?opcao=listar");
+            return;
+        }
+
+        lerFlash(req);
+        req.setAttribute("pedidoAtual", pedido);
+        req.setAttribute("itens", itemDao.buscarPorPedido(codpedido));
+        req.setAttribute("cardapios", cardapioDao.buscarTodos());
+        req.getRequestDispatcher("/ItensPedido.jsp").forward(req, res);
+    }
+
+    private void adicionarItem(HttpServletRequest req, HttpServletResponse res,
+            String cod, String codCardapio, String quantidade) throws IOException {
+        PedidoPorCardapio item = new PedidoPorCardapio();
+        Pedido pedido = new Pedido();   pedido.setCodpedido(Integer.valueOf(cod));       item.setPedidoItem(pedido);
+        Cardapio cardapio = new Cardapio(); cardapio.setCodCardapio(Integer.valueOf(codCardapio)); item.setCardapioItem(cardapio);
+        item.setQuantidade(Integer.valueOf(quantidade));
+
+        itemDao.salvar(item);
+        req.getSession().setAttribute("flash", "Item adicionado ao pedido!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH
+                + "/PedidoController?opcao=abrirItens&codpedido=" + cod);
+    }
+
+    private void removerItem(HttpServletRequest req, HttpServletResponse res,
+            String cod, String codItem) throws IOException {
+        PedidoPorCardapio item = new PedidoPorCardapio();
+        item.setCodPedidoPorCardapio(Integer.valueOf(codItem));
+        itemDao.excluir(item);
+        req.getSession().setAttribute("flash", "Item removido do pedido!");
+        res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH
+                + "/PedidoController?opcao=abrirItens&codpedido=" + cod);
+    }
+
+    /** Move a mensagem gravada na sessao (PRG) para o request. */
+    private void lerFlash(HttpServletRequest request) {
         String flash = (String) request.getSession().getAttribute("flash");
         if (flash != null) {
             if (request.getAttribute("mensagem") == null) request.setAttribute("mensagem", flash);
             request.getSession().removeAttribute("flash");
         }
+    }
+
+    private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        lerFlash(request);
+        // A consulta ja traz a quantidade de itens e o total de cada pedido
         List<Pedido> lista = dao.buscarTodos();
         request.setAttribute("pedidos", lista);
         request.setAttribute("clientes", clienteDao.buscarTodos());

@@ -1,5 +1,6 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+   <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,6 +16,8 @@
 
 <%@ include file="menu.jsp" %>
 
+<c:set var="URL_CONTROLLER" value="${pageContext.request.contextPath}${URL_BASE}/PedidoController"/>
+
 <div class="page-wrapper">
 
     <div class="card shadow-sm mb-4">
@@ -27,8 +30,7 @@
                 <div class="mensagem"><i class="fa-solid fa-circle-check"></i> ${mensagem}</div>
             </c:if>
 
-            <form id="formCadastro" method="get"
-                action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/PedidoController">
+            <form id="formCadastro" method="get" action="${URL_CONTROLLER}">
                 <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}"/>
                 <input type="hidden" name="codpedido" value="${empty codpedido ? 0 : codpedido}"/>
                 <div class="row g-3">
@@ -69,7 +71,7 @@
                 <button type="submit" form="formCadastro" class="btn-salvar">
                     <i class="fa-solid fa-floppy-disk"></i> Salvar
                 </button>
-                <a href="${pageContext.request.contextPath}${URL_BASE}/PedidoController?opcao=listar" class="btn-cancelar">
+                <a href="${URL_CONTROLLER}?opcao=listar" class="btn-cancelar">
                     <i class="fa-solid fa-ban"></i> Cancelar
                 </a>
             </div>
@@ -81,9 +83,10 @@
             <div class="card-header">
                 <i class="fa-solid fa-list"></i>
                 <h5>Pedidos Cadastrados</h5>
+                <span class="header-hint"><i class="fa-solid fa-circle-info"></i> clique em <b>Itens</b> para abrir a comanda</span>
             </div>
             <div class="table-wrapper">
-                <table class="table">
+                <table class="table tabela-pedidos">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -91,34 +94,47 @@
                             <th>Mesa</th>
                             <th>Funcionário</th>
                             <th>Data/Hora</th>
+                            <th>Itens</th>
+                            <th>Total</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="item" items="${pedidos}">
                             <tr>
-                                <td>${item.codpedido}</td>
+                                <td><span class="cod-pedido">#${item.codpedido}</span></td>
                                 <td>${item.clientePedido.nomeCliente}</td>
                                 <td>Mesa ${item.mesaPedido.numeroMesa}</td>
                                 <td>${item.funcionarioPedido.nomeFuncionario}</td>
-                                <td>${item.datahoraPedido}</td>
+                                <td>${item.datahoraFormatada}</td>
                                 <td>
-                                    <form method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/PedidoController" style="display:inline">
-                                        <input type="hidden" name="opcao" value="enviarAlterar"/>
-                                        <input type="hidden" name="codpedido" value="${item.codpedido}"/>
-                                        <input type="hidden" name="codCliente" value="${item.clientePedido.codCliente}"/>
-                                        <input type="hidden" name="codMesa" value="${item.mesaPedido.codMesa}"/>
-                                        <input type="hidden" name="codFuncionario" value="${item.funcionarioPedido.codFuncionario}"/>
-                                        <button type="submit" class="btn-alterar"><i class="fa-solid fa-pencil"></i> Alterar</button>
-                                    </form>
-                                    <form method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/PedidoController" style="display:inline">
-                                        <input type="hidden" name="opcao" value="enviarExcluir"/>
-                                        <input type="hidden" name="codpedido" value="${item.codpedido}"/>
-                                        <input type="hidden" name="codCliente" value="${item.clientePedido.codCliente}"/>
-                                        <input type="hidden" name="codMesa" value="${item.mesaPedido.codMesa}"/>
-                                        <input type="hidden" name="codFuncionario" value="${item.funcionarioPedido.codFuncionario}"/>
-                                        <button type="submit" class="btn-excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
-                                    </form>
+                                    <span class="badge-qtd ${item.qtdItens == 0 ? 'vazio' : ''}">${item.qtdItens} un.</span>
+                                </td>
+                                <td class="valor-total">
+                                    R$ <fmt:formatNumber value="${item.total}" pattern="#,##0.00"/>
+                                </td>
+                                <td>
+                                    <div class="acoes">
+                                        <a href="${URL_CONTROLLER}?opcao=abrirItens&codpedido=${item.codpedido}" class="btn-itens">
+                                            <i class="fa-solid fa-burger"></i> Itens
+                                        </a>
+                                        <form method="get" action="${URL_CONTROLLER}" style="display:inline">
+                                            <input type="hidden" name="opcao" value="enviarAlterar"/>
+                                            <input type="hidden" name="codpedido" value="${item.codpedido}"/>
+                                            <input type="hidden" name="codCliente" value="${item.clientePedido.codCliente}"/>
+                                            <input type="hidden" name="codMesa" value="${item.mesaPedido.codMesa}"/>
+                                            <input type="hidden" name="codFuncionario" value="${item.funcionarioPedido.codFuncionario}"/>
+                                            <button type="submit" class="btn-alterar"><i class="fa-solid fa-pencil"></i> Alterar</button>
+                                        </form>
+                                        <form method="get" action="${URL_CONTROLLER}" style="display:inline">
+                                            <input type="hidden" name="opcao" value="enviarExcluir"/>
+                                            <input type="hidden" name="codpedido" value="${item.codpedido}"/>
+                                            <input type="hidden" name="codCliente" value="${item.clientePedido.codCliente}"/>
+                                            <input type="hidden" name="codMesa" value="${item.mesaPedido.codMesa}"/>
+                                            <input type="hidden" name="codFuncionario" value="${item.funcionarioPedido.codFuncionario}"/>
+                                            <button type="submit" class="btn-excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>

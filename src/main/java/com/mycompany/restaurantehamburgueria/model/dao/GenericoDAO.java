@@ -82,6 +82,35 @@ public class GenericoDAO<T> {
         return entidades;
     }
 
+    public List<T> buscarTodos(String comandoSql, RowMapper<T> rowMapper, Object... parametros) {
+        List<T> entidades = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            con = connectionFactory.getConnection();
+            pstmt = con.prepareStatement(comandoSql);
+            for (int i = 0; i < parametros.length; i++) {
+                pstmt.setObject(i + 1, parametros[i]);
+            }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                entidades.add(rowMapper.mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return entidades;
+    }
+
     public T buscarPorId(String comandoSql, RowMapper<T> rowMapper, Object... parametros) {
         T entidade = null;
         Connection con = null;

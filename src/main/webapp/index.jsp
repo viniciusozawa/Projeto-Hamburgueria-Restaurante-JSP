@@ -139,7 +139,7 @@
             </div>
         </section>
 
-        <!-- ===== FOOTER ===== -->
+           <!-- ===== FOOTER ===== -->
         <footer>
             <i class="fa-solid fa-burger me-1"></i>
             <span class="brand">Big Tites</span> &copy; 2024 &mdash; Sistema de Gerenciamento
