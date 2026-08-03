@@ -17,7 +17,7 @@
 
 -- Copiando estrutura do banco de dados para bd_restaurante
 DROP DATABASE IF EXISTS `bd_restaurante`;
-CREATE DATABASE IF NOT EXISTS `bd_restaurante` /*!40100 DEFAULT CHARACTER SET utf8mb3 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `bd_restaurante` /*!40100 DEFAULT CHARACTER SET latin1 */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `bd_restaurante`;
 
 -- Copiando estrutura para tabela bd_restaurante.cardapio
@@ -31,11 +31,11 @@ CREATE TABLE IF NOT EXISTS `cardapio` (
   PRIMARY KEY (`codCardapio`,`categoria_codCategoria`),
   KEY `fk_cardapio_categoria1_idx` (`categoria_codCategoria`),
   CONSTRAINT `fk_cardapio_categoria1` FOREIGN KEY (`categoria_codCategoria`) REFERENCES `categoria` (`codCategoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.cardapio: ~9 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.cardapio: ~10 rows (aproximadamente)
 INSERT INTO `cardapio` (`codCardapio`, `nomeComida`, `valorComida`, `descricaoComida`, `categoria_codCategoria`) VALUES
-	(1, 'BIGTITES', 10.20, 'Grande molho cheddar', 1),
+	(1, 'BIGTITES', 10.20, 'Grande molho cheddar', 3),
 	(2, 'Cheeseburger Clássico', 7.99, 'Pão, hambúrguer artesanal, queijo prato, alface, tomate e molho especial', 1),
 	(3, 'Cheesebacon', 22.50, 'Hambúrguer artesanal, queijo cheddar, bacon crocante e maionese da casa', 1),
 	(4, 'Smash Duplo', 26.90, 'Dois hambúrgueres smash 100g, queijo cheddar, cebola caramelizada e pão brioche', 1),
@@ -44,7 +44,8 @@ INSERT INTO `cardapio` (`codCardapio`, `nomeComida`, `valorComida`, `descricaoCo
 	(7, 'Refrigerante Lata', 6.00, 'Coca-Cola, Guaraná ou Fanta (350ml)', 2),
 	(8, 'Milkshake de Chocolate', 15.00, 'Milkshake cremoso com calda de chocolate', 3),
 	(9, 'Brownie com Sorvete', 16.50, 'Brownie caseiro com bola de sorvete de creme e calda de chocolate', 3),
-	(10, 'a', 0.00, 'a', 1);
+	(10, 'Sorvete', 20.00, '2 bolasde chocolate', 3),
+	(13, 'GRANDE BIGTITES', 20.00, 'sdas', 1);
 
 -- Copiando estrutura para tabela bd_restaurante.cardapio_por_ingrediente
 DROP TABLE IF EXISTS `cardapio_por_ingrediente`;
@@ -92,15 +93,17 @@ CREATE TABLE IF NOT EXISTS `cargo` (
   `codCargo` int NOT NULL AUTO_INCREMENT,
   `nomeCargo` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`codCargo`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.cargo: ~5 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.cargo: ~7 rows (aproximadamente)
 INSERT INTO `cargo` (`codCargo`, `nomeCargo`) VALUES
-	(1, 'Cozinheiro'),
+	(1, 'Cozinheiro '),
 	(2, 'Garçom'),
 	(3, 'Gerente'),
 	(4, 'Atentende'),
-	(5, 'ddd');
+	(7, 'sdad'),
+	(11, 'dd'),
+	(12, 'as');
 
 -- Copiando estrutura para tabela bd_restaurante.categoria
 DROP TABLE IF EXISTS `categoria`;
@@ -108,9 +111,9 @@ CREATE TABLE IF NOT EXISTS `categoria` (
   `codCategoria` int NOT NULL AUTO_INCREMENT,
   `nomeCategoria` varchar(150) NOT NULL,
   PRIMARY KEY (`codCategoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.categoria: ~4 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.categoria: ~5 rows (aproximadamente)
 INSERT INTO `categoria` (`codCategoria`, `nomeCategoria`) VALUES
 	(1, 'Hamburguer'),
 	(2, 'Bebida'),
@@ -127,19 +130,23 @@ CREATE TABLE IF NOT EXISTS `cliente` (
   `telefone` varchar(50) DEFAULT NULL,
   `dataCadastro` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`codCliente`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.cliente: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.cliente: ~8 rows (aproximadamente)
 INSERT INTO `cliente` (`codCliente`, `nomeCliente`, `cpfCliente`, `senhaCliente`, `telefone`, `dataCadastro`) VALUES
-	(1, 'YUJI', '', 'otaviano', '293821', '2025-09-13 19:15:50'),
+	(1, 'YUJI', '21331231323', 'otaviano', '293821', '2025-09-13 19:15:50'),
 	(2, 'Otavio', '', 'marmota', '(35)99999-9999', '2025-09-14 12:30:38'),
 	(3, 'Pedro', 'luquinhas', '67', '(35)91022-1202', '2025-09-14 12:31:02'),
-	(5, 'rogerio', 'dsd', 'sdd', '23131', '2025-10-29 09:15:35');
+	(5, 'rogerio', 'dsd', 'sdd', '23131', '2025-10-29 09:15:35'),
+	(7, 'Yamamoto', '000.000.000-00', 'a', '(32)99999-9999', '2025-11-11 15:03:28'),
+	(9, 'Vinicius', '023.380.796-98', 'a', '(35)99999-9999', '2025-11-17 12:46:38'),
+	(10, 'Arthur Miranda', '145.552.656-07', 'a', '(35)99999-9999', '2025-11-19 09:42:47'),
+	(13, 'Roberto Soares', '123.213.433-21', 'sa', '359921-2321', '2026-08-02 17:11:12');
 
 -- Copiando estrutura para evento bd_restaurante.event_disponibilidadeTrabalho
 DROP EVENT IF EXISTS `event_disponibilidadeTrabalho`;
 DELIMITER //
-CREATE EVENT `event_disponibilidadeTrabalho` ON SCHEDULE EVERY 1 HOUR STARTS '2025-10-29 09:35:26' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+CREATE EVENT `event_disponibilidadeTrabalho` ON SCHEDULE EVERY 1 MINUTE STARTS '2025-10-29 09:35:26' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
 -- Verifica se o horário atual está dentro do horário do turno
 	UPDATE funcionario f
     inner JOIN turnos t ON f.turnos_codTurnos = t.codTurnos
@@ -162,13 +169,15 @@ CREATE TABLE IF NOT EXISTS `feedback` (
   `cliente_codCliente` int NOT NULL,
   PRIMARY KEY (`codFeedback`,`cliente_codCliente`),
   KEY `fk_feedback_cliente1_idx` (`cliente_codCliente`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.feedback: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.feedback: ~5 rows (aproximadamente)
 INSERT INTO `feedback` (`codFeedback`, `nota`, `descricao`, `dataFeedback`, `cliente_codCliente`) VALUES
 	(1, 10, 'Lanche muito Bom', '2025-09-20 17:52:44', 3),
 	(2, 4, 'Mediana', '2025-09-20 17:53:00', 2),
-	(3, 2, 'Mal atendimento', '2025-11-01 00:37:38', 1);
+	(3, 2, 'Mal atendimento', '2025-11-01 00:37:38', 1),
+	(4, 2, 'a', '2025-11-17 12:37:43', 2),
+	(5, 10, 'muito legar', '2025-11-17 12:48:51', 9);
 
 -- Copiando estrutura para tabela bd_restaurante.fornecedores
 DROP TABLE IF EXISTS `fornecedores`;
@@ -181,9 +190,9 @@ CREATE TABLE IF NOT EXISTS `fornecedores` (
   `cidade` varchar(45) DEFAULT NULL,
   `estado` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`codFornecedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.fornecedores: ~6 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.fornecedores: ~7 rows (aproximadamente)
 INSERT INTO `fornecedores` (`codFornecedor`, `nomeFornecedor`, `cnpj`, `endereco`, `bairro`, `cidade`, `estado`) VALUES
 	(2, 'Pães & Cia LTDA', '12.345.678/0001-90', 'Rua dos Padeiros, 123', 'Centro', 'São Paulo', 'SP'),
 	(3, 'Carne Nobre Distribuidora', '23.456.789/0001-01', 'Av. do Açougue, 456', 'Industrial', 'Campinas', 'SP'),
@@ -191,7 +200,7 @@ INSERT INTO `fornecedores` (`codFornecedor`, `nomeFornecedor`, `cnpj`, `endereco
 	(5, 'VerdeFresco Hortifruti', '45.678.901/0001-03', 'Av. das Hortas, 321', 'Jardim das Flores', 'Curitiba', 'PR'),
 	(6, 'Molhos Gourmet SA', '56.789.012/0001-04', 'Rua dos Temperos, 654', 'Sabores', 'Rio de Janeiro', 'RJ'),
 	(7, 'Bebidas Geladas ME', '67.890.123/0001-05', 'Av. da Bebida, 987', 'Barra Funda', 'São Pau', 'SP'),
-	(8, 'a', 'a', 'a', 'a', 'a', 'RS');
+	(8, 'a', 'a', 'a', 'a', 'ads', 'RS');
 
 -- Copiando estrutura para tabela bd_restaurante.funcionario
 DROP TABLE IF EXISTS `funcionario`;
@@ -208,9 +217,9 @@ CREATE TABLE IF NOT EXISTS `funcionario` (
   PRIMARY KEY (`codFuncionario`,`turnos_codTurnos`,`cargo_codCargo`) USING BTREE,
   KEY `fk_funcionario_turnos1_idx` (`turnos_codTurnos`),
   KEY `fk_funcionario_cargo1_idx` (`cargo_codCargo`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.funcionario: ~4 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.funcionario: ~5 rows (aproximadamente)
 INSERT INTO `funcionario` (`codFuncionario`, `nomeFuncionario`, `dataNascimento`, `senhaFuncionario`, `cpfFuncionario`, `salarioFuncionario`, `turnos_codTurnos`, `cargo_codCargo`, `disponivel`) VALUES
 	(2, 'Robertinho', '1900-09-20', '02392032', '210290192', 2000.00, 1, 1, 1),
 	(3, 'Roberto', '2001-09-13', 'd', 'dd', 2.00, 1, 1, 1),
@@ -231,22 +240,47 @@ CREATE TABLE IF NOT EXISTS `ingrediente` (
   PRIMARY KEY (`codIngrediente`,`fornecedores_codFornecedor`),
   KEY `fk_ingrediente_fornecedores1_idx` (`fornecedores_codFornecedor`),
   CONSTRAINT `fk_ingrediente_fornecedores1` FOREIGN KEY (`fornecedores_codFornecedor`) REFERENCES `fornecedores` (`codFornecedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.ingrediente: ~12 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.ingrediente: ~14 rows (aproximadamente)
 INSERT INTO `ingrediente` (`codIngrediente`, `nomeIngredientes`, `quantiIngredientes`, `dataProducao`, `dataVencimento`, `valorIngrediente`, `descricaoIngrediente`, `fornecedores_codFornecedor`) VALUES
 	(1, 'dd', 10.00, '2025-10-25', '2025-10-31', 23.00, 'sds', 6),
-	(6, 'Pão', 96.00, '2025-10-01', '2026-03-28', 1.50, 'Pão artesanal de hambúrguer', 2),
-	(7, 'Queijo Cheddar', 200.00, '2025-11-01', '2023-06-30', 2.00, 'Queijo cheddar derretido', 4),
-	(8, 'Bacon Crocante', 149.00, '2025-12-01', '2023-05-30', 1.50, 'Bacon crocante e frito', 3),
+	(6, 'Pão', 66.00, '2025-10-01', '2026-03-28', 1.50, 'Pão artesanal de hambúrguer', 2),
+	(7, 'Queijo Cheddar', 155.00, '2025-11-01', '2023-06-30', 2.00, 'Queijo cheddar derretido', 4),
+	(8, 'Bacon Crocante', 93.00, '2025-12-01', '2023-05-30', 1.50, 'Bacon crocante e frito', 3),
 	(9, 'Alface', 120.00, '2025-11-10', '2025-10-16', 0.50, 'Alface fresca e crocante', 5),
-	(17, 'Pão Brioche', 99.00, '2025-10-01', '2026-10-01', 1.50, 'Pão brioche para hambúrguer', 8),
+	(17, 'Pão Brioche', 58.00, '2025-10-01', '2026-10-01', 1.50, 'Pão brioche para hambúrguer', 8),
 	(18, 'Queijo Cheddar', 200.00, '2025-10-01', '2026-10-01', 2.00, 'Queijo cheddar derretido', 2),
 	(19, 'Bacon Crocante', 150.00, '2025-10-01', '2026-10-01', 1.80, 'Bacon crocante e frito', 3),
 	(20, 'Alface Fresca', 120.00, '2025-10-01', '2025-12-01', 0.50, 'Alface fresca e crocante', 4),
 	(21, 'Molho Especial', 100.00, '2025-10-01', '2026-10-01', 2.00, 'Molho especial para hambúrguer', 5),
-	(22, 'Chocolate em pó', 56.00, '2025-10-01', '2025-12-01', 3.00, 'Chocolate em pó para milkshake', 6),
-	(23, 'Creme de Leite', 54.00, '2025-10-01', '2026-10-01', 2.50, 'Creme de leite para milkshake', 7);
+	(22, 'Chocolate em pó', 26.00, '2025-10-01', '2025-12-01', 3.00, 'Chocolate em pó para milkshake', 6),
+	(23, 'Creme de Leite', 9.00, '2025-10-01', '2026-10-01', 2.50, 'Creme de leite para milkshake', 7),
+	(26, 's', 11.00, '2025-11-19', '2025-11-19', 1.00, 's', 3);
+
+-- Copiando estrutura para procedure bd_restaurante.inserirFeedback
+DROP PROCEDURE IF EXISTS `inserirFeedback`;
+DELIMITER //
+CREATE PROCEDURE `inserirFeedback`(
+    IN p_nota INT,
+    IN p_descricao VARCHAR(255),
+    IN p_cliente_codCliente INT
+)
+BEGIN
+    INSERT INTO feedback (
+        nota,
+        descricao,
+        dataFeedback,
+        cliente_codCliente
+    )
+    VALUES (
+        p_nota,
+        p_descricao,
+        NOW(),
+        p_cliente_codCliente
+    );
+END//
+DELIMITER ;
 
 -- Copiando estrutura para tabela bd_restaurante.mesa
 DROP TABLE IF EXISTS `mesa`;
@@ -255,23 +289,23 @@ CREATE TABLE IF NOT EXISTS `mesa` (
   `numeroMesa` int NOT NULL,
   `localMesa` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`codMesa`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
 -- Copiando dados para a tabela bd_restaurante.mesa: ~5 rows (aproximadamente)
 INSERT INTO `mesa` (`codMesa`, `numeroMesa`, `localMesa`) VALUES
 	(1, 10, 'Jogar'),
-	(2, 5, 'f'),
 	(3, 2, 'Perto da Cozinha'),
 	(4, 1, 'Perto entrada'),
-	(5, 4, 'Bancada');
+	(5, 4, 'Bancada'),
+	(7, 1, 'e');
 
 -- Copiando estrutura para tabela bd_restaurante.pagamento
 DROP TABLE IF EXISTS `pagamento`;
 CREATE TABLE IF NOT EXISTS `pagamento` (
   `codPagamento` int NOT NULL AUTO_INCREMENT,
-  `formaPagamento` varchar(150) NOT NULL,
-  `valorPago` decimal(10,2) NOT NULL,
-  `dataPagamento` date NOT NULL,
+  `formaPagamento` varchar(150) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `valorPago` decimal(10,2) DEFAULT NULL,
+  `dataPagamento` date DEFAULT (now()),
   `statusPagamento` varchar(150) DEFAULT NULL,
   `pedido_codpedido` int NOT NULL,
   `cliente_codCliente` int NOT NULL,
@@ -280,13 +314,24 @@ CREATE TABLE IF NOT EXISTS `pagamento` (
   KEY `fk_cliente_pagamento` (`cliente_codCliente`),
   CONSTRAINT `fk_cliente_pagamento` FOREIGN KEY (`cliente_codCliente`) REFERENCES `cliente` (`codCliente`),
   CONSTRAINT `fk_pagamento_pedido1` FOREIGN KEY (`pedido_codpedido`) REFERENCES `pedido` (`codpedido`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.pagamento: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.pagamento: ~15 rows (aproximadamente)
 INSERT INTO `pagamento` (`codPagamento`, `formaPagamento`, `valorPago`, `dataPagamento`, `statusPagamento`, `pedido_codpedido`, `cliente_codCliente`) VALUES
 	(5, 'pix', 60.00, '2025-10-29', 'andademento', 1, 1),
 	(6, 'dinheiro', 24.00, '2025-10-31', 'andamento', 3, 2),
-	(7, 'pix', 18.00, '2025-11-04', 'andamento', 15, 5);
+	(7, 'pix', 18.00, '2025-11-04', 'andamento', 15, 5),
+	(8, 'pix', 10.20, '2025-11-18', 'andamento', 17, 1),
+	(9, 'pix', 10.20, '2025-11-18', 'andamento', 18, 9),
+	(10, NULL, 18.00, '2025-11-23', NULL, 40, 9),
+	(11, NULL, 7.98, '2025-11-24', NULL, 43, 9),
+	(12, 'Dinheiro', 36.50, '2025-11-24', 'pago', 44, 9),
+	(13, 'Dinheiro', 269.00, '2025-11-24', 'andamento', 45, 9),
+	(14, NULL, 16.50, '2025-11-24', 'andamenento', 46, 9),
+	(15, NULL, 32.90, '2025-11-24', 'andamenento', 47, 9),
+	(16, 'Dinheiro', 252.00, '2025-12-03', 'pago', 48, 7),
+	(17, 'Dinheiro', 102.00, '2025-12-03', 'pago', 49, 7),
+	(18, 'Pix', 16.50, '2026-06-21', 'andamento', 46, 9);
 
 -- Copiando estrutura para tabela bd_restaurante.pedido
 DROP TABLE IF EXISTS `pedido`;
@@ -295,40 +340,66 @@ CREATE TABLE IF NOT EXISTS `pedido` (
   `cliente_codCliente` int NOT NULL,
   `mesa_codMesa` int NOT NULL,
   `funcionario_codFuncionario` int NOT NULL,
-  `datahoraPedido` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `datahoraPedido` datetime DEFAULT (now()),
   PRIMARY KEY (`codpedido`,`cliente_codCliente`,`mesa_codMesa`,`funcionario_codFuncionario`),
   KEY `fk_pedido_cliente1_idx` (`cliente_codCliente`),
   KEY `fk_pedido_mesa1_idx` (`mesa_codMesa`),
   KEY `fk_pedido_funcionario1_idx` (`funcionario_codFuncionario`),
-  CONSTRAINT `fk_pedido_cliente1` FOREIGN KEY (`cliente_codCliente`) REFERENCES `cliente` (`codCliente`),
-  CONSTRAINT `fk_pedido_funcionario1` FOREIGN KEY (`funcionario_codFuncionario`) REFERENCES `funcionario` (`codFuncionario`),
+  CONSTRAINT `fk_pedido_cliente1` FOREIGN KEY (`cliente_codCliente`) REFERENCES `cliente` (`codCliente`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pedido_funcionario1` FOREIGN KEY (`funcionario_codFuncionario`) REFERENCES `funcionario` (`codFuncionario`) ON DELETE CASCADE,
   CONSTRAINT `fk_pedido_mesa1` FOREIGN KEY (`mesa_codMesa`) REFERENCES `mesa` (`codMesa`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.pedido: ~5 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.pedido: ~31 rows (aproximadamente)
 INSERT INTO `pedido` (`codpedido`, `cliente_codCliente`, `mesa_codMesa`, `funcionario_codFuncionario`, `datahoraPedido`) VALUES
 	(1, 1, 1, 2, '2025-09-14 11:52:40'),
 	(2, 3, 3, 2, '2025-09-14 12:34:09'),
 	(3, 2, 5, 2, '2025-09-14 12:34:26'),
 	(4, 1, 4, 2, '2025-09-20 20:19:00'),
-	(15, 5, 5, 3, '2025-10-29 09:23:34');
+	(15, 5, 5, 3, '2025-10-29 09:23:34'),
+	(17, 1, 3, 2, '2025-11-18 20:44:19'),
+	(18, 9, 5, 3, '2025-11-18 20:56:22'),
+	(21, 9, 1, 2, '2025-11-23 01:09:01'),
+	(22, 9, 1, 2, '2025-11-23 01:26:33'),
+	(25, 9, 1, 2, '2025-11-23 09:33:45'),
+	(26, 9, 1, 2, '2025-11-23 09:37:30'),
+	(27, 9, 4, 4, '2025-11-23 12:19:07'),
+	(29, 9, 4, 2, '2025-11-23 12:21:35'),
+	(31, 9, 1, 2, '2025-11-23 12:23:52'),
+	(34, 9, 1, 2, '2025-11-23 12:32:41'),
+	(35, 9, 1, 2, '2025-11-23 12:37:01'),
+	(36, 9, 1, 2, '2025-11-23 12:41:55'),
+	(37, 9, 1, 2, '2025-11-23 12:44:57'),
+	(38, 9, 1, 2, '2025-11-23 12:53:48'),
+	(39, 9, 1, 2, '2025-11-23 13:00:22'),
+	(40, 9, 1, 2, '2025-11-23 13:01:41'),
+	(41, 7, 1, 2, '2025-11-23 13:51:14'),
+	(42, 9, 1, 2, '2025-11-24 07:16:08'),
+	(43, 9, 1, 2, '2025-11-24 07:55:52'),
+	(44, 9, 1, 2, '2025-11-24 08:13:17'),
+	(45, 9, 4, 4, '2025-11-24 08:19:05'),
+	(46, 9, 1, 2, '2025-11-24 16:31:38'),
+	(47, 9, 3, 4, '2025-11-24 16:36:56'),
+	(48, 7, 5, 5, '2025-12-03 09:09:35'),
+	(49, 7, 4, 2, '2025-12-03 09:48:08'),
+	(53, 13, 7, 4, '2026-08-02 17:16:13');
 
 -- Copiando estrutura para tabela bd_restaurante.pedido_por_cardapio
 DROP TABLE IF EXISTS `pedido_por_cardapio`;
 CREATE TABLE IF NOT EXISTS `pedido_por_cardapio` (
-  `codpedido_por_cadapio` int NOT NULL AUTO_INCREMENT,
+  `codpedido_por_cardapio` int NOT NULL AUTO_INCREMENT,
   `pedido_idpedido` int NOT NULL,
   `cardapio_codCardapio` int NOT NULL,
   `quantidade` int NOT NULL,
-  PRIMARY KEY (`codpedido_por_cadapio`,`pedido_idpedido`,`cardapio_codCardapio`),
+  PRIMARY KEY (`codpedido_por_cardapio`,`pedido_idpedido`,`cardapio_codCardapio`) USING BTREE,
   KEY `fk_pedido_has_cardapio_cardapio1_idx` (`cardapio_codCardapio`),
   KEY `fk_pedido_has_cardapio_pedido1_idx` (`pedido_idpedido`),
-  CONSTRAINT `fk_pedido_has_cardapio_cardapio1` FOREIGN KEY (`cardapio_codCardapio`) REFERENCES `cardapio` (`codCardapio`),
-  CONSTRAINT `fk_pedido_has_cardapio_pedido1` FOREIGN KEY (`pedido_idpedido`) REFERENCES `pedido` (`codpedido`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb3;
+  CONSTRAINT `fk_pedido_has_cardapio_cardapio1` FOREIGN KEY (`cardapio_codCardapio`) REFERENCES `cardapio` (`codCardapio`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_pedido_has_cardapio_pedido1` FOREIGN KEY (`pedido_idpedido`) REFERENCES `pedido` (`codpedido`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.pedido_por_cardapio: ~11 rows (aproximadamente)
-INSERT INTO `pedido_por_cardapio` (`codpedido_por_cadapio`, `pedido_idpedido`, `cardapio_codCardapio`, `quantidade`) VALUES
+-- Copiando dados para a tabela bd_restaurante.pedido_por_cardapio: ~48 rows (aproximadamente)
+INSERT INTO `pedido_por_cardapio` (`codpedido_por_cardapio`, `pedido_idpedido`, `cardapio_codCardapio`, `quantidade`) VALUES
 	(1, 1, 1, 2),
 	(2, 1, 1, 1),
 	(3, 2, 8, 1),
@@ -338,8 +409,45 @@ INSERT INTO `pedido_por_cardapio` (`codpedido_por_cadapio`, `pedido_idpedido`, `
 	(12, 1, 1, 2),
 	(13, 1, 1, 2),
 	(17, 2, 8, 2),
-	(18, 4, 8, 0),
-	(19, 15, 6, 1);
+	(19, 15, 6, 1),
+	(20, 17, 1, 1),
+	(21, 18, 1, 1),
+	(22, 25, 6, 1),
+	(23, 26, 8, 1),
+	(24, 26, 10, 1),
+	(25, 26, 7, 1),
+	(26, 29, 4, 1),
+	(27, 31, 7, 1),
+	(29, 34, 6, 1),
+	(30, 35, 6, 1),
+	(31, 35, 9, 1),
+	(32, 36, 10, 1),
+	(33, 37, 7, 1),
+	(34, 37, 10, 1),
+	(35, 37, 9, 1),
+	(36, 38, 6, 1),
+	(37, 39, 7, 1),
+	(38, 40, 6, 1),
+	(39, 41, 6, 1),
+	(40, 42, 4, 1),
+	(41, 43, 5, 1),
+	(42, 44, 10, 1),
+	(43, 44, 9, 1),
+	(44, 45, 4, 10),
+	(45, 46, 9, 1),
+	(46, 47, 4, 1),
+	(47, 47, 7, 1),
+	(48, 48, 7, 7),
+	(49, 48, 8, 7),
+	(50, 48, 8, 7),
+	(51, 49, 1, 10),
+	(53, 15, 1, 1),
+	(54, 1, 10, 1),
+	(55, 1, 13, 1),
+	(56, 1, 10, 1),
+	(57, 53, 7, 2),
+	(58, 53, 1, 1),
+	(59, 4, 1, 1);
 
 -- Copiando estrutura para procedure bd_restaurante.proc_alterarCardapio
 DROP PROCEDURE IF EXISTS `proc_alterarCardapio`;
@@ -764,9 +872,9 @@ BEGIN
    IF (@existe > 0) THEN
       DELETE FROM funcionario
       WHERE codFuncionario = entradaCodFuncionario;
-      SELECT 'Deu certo' AS mensagem;
-   ELSE
-      SELECT 'Código não encontrado.' AS mensagem;
+      
+
+      
    END IF;
 
 END//
@@ -827,7 +935,6 @@ BEGIN
     INSERT INTO cardapio (nomeComida, valorComida, descricaoComida, categoria_codCategoria)
     VALUES(entradaNomeComida, entradaValorComida, entradaDescricaoComida, entradaCodCategoria);
 
-    SELECT 'Novo item do cardápio inserido com sucesso!' AS Resultado;
     
 END//
 DELIMITER ;
@@ -849,39 +956,13 @@ DROP PROCEDURE IF EXISTS `proc_insereCliente`;
 DELIMITER //
 CREATE PROCEDURE `proc_insereCliente`(
 	IN `entradaNome` VARCHAR(150),
+	IN `entradaCpf` VARCHAR(45),
 	IN `entradaSenha` VARCHAR(150),
-	IN `entradaData` DATE
+	IN `entradaTelefone` VARCHAR(50)
 )
 BEGIN
-    INSERT INTO cliente(nomeCliente, senhaCliente)
-    VALUES(entradaNome, entradaSenha);
-END//
-DELIMITER ;
-
--- Copiando estrutura para procedure bd_restaurante.proc_insereEstoque
-DROP PROCEDURE IF EXISTS `proc_insereEstoque`;
-DELIMITER //
-CREATE PROCEDURE `proc_insereEstoque`(
-	IN `p_nomeItem` VARCHAR(150),
-	IN `p_quant` DECIMAL(6,2),
-	IN `p_dataProducao` DATE,
-	IN `p_dataVencimento` DATE,
-	IN `p_descricao` VARCHAR(300)
-)
-BEGIN
-    INSERT INTO estoque (
-        nomeItem,
-        quant,
-        dataProducao,
-        dataVencimento,
-        descricao
-    ) VALUES (
-        p_nomeItem,
-        p_quant,
-        p_dataProducao,
-        p_dataVencimento,
-        p_descricao
-    );
+    INSERT INTO cliente(nomeCliente, cliente.cpfCliente, cliente.senhaCliente, cliente.telefone)
+    VALUES(entradaNome, entradaCpf, entradaSenha, entradaTelefone);
 END//
 DELIMITER ;
 
@@ -911,8 +992,9 @@ CREATE PROCEDURE `proc_insereFuncionario`(
 	IN `entradaSenha` VARCHAR(45),
 	IN `entradaCpf` VARCHAR(45),
 	IN `entradaSalario` DECIMAL(6,2),
-	IN `entradaCargo` VARCHAR(150),
-	IN `entradacodTurno` INT
+	IN `entradaCargo` INT,
+	IN `entradacodTurno` INT,
+	IN `entradaDisponivel` TINYTEXT
 )
 BEGIN
 	SELECT COUNT(*) INTO @contadorTurno FROM turnos WHERE codTurnos = entradacodTurno;
@@ -936,7 +1018,7 @@ BEGIN
       entradaSalario,
       entradacodTurno,
       entradaCargo,
-      1
+      entradaDisponivel
     );
     SELECT 'Funcionário inserido com sucesso!' AS Resultado;
   		ELSEIF (@contadorTurno = 0) THEN
@@ -944,6 +1026,39 @@ BEGIN
   ELSE
     	SELECT 'Cargo não cadastrado' AS Erro;
   END IF;
+END//
+DELIMITER ;
+
+-- Copiando estrutura para procedure bd_restaurante.proc_insereIngrediente
+DROP PROCEDURE IF EXISTS `proc_insereIngrediente`;
+DELIMITER //
+CREATE PROCEDURE `proc_insereIngrediente`(
+	IN `p_nomeItem` VARCHAR(150),
+	IN `p_quant` DECIMAL(6,2),
+	IN `p_dataProducao` DATE,
+	IN `p_dataVencimento` DATE,
+	IN `p_valor` DECIMAL(6,2),
+	IN `p_descricao` VARCHAR(300),
+	IN `p_Fornecedores` INT
+)
+BEGIN
+    INSERT INTO ingrediente (
+      	ingrediente.nomeIngredientes,
+        ingrediente.quantiIngredientes,
+        ingrediente.dataProducao,
+        ingrediente.dataVencimento,
+        ingrediente.valorIngrediente,
+        ingrediente.descricaoIngrediente,
+        ingrediente.fornecedores_codFornecedor
+    ) VALUES (
+        p_nomeItem,
+        p_quant,
+        p_dataProducao,
+        p_dataVencimento,
+        p_valor,
+        p_descricao,
+        p_Fornecedores
+    );
 END//
 DELIMITER ;
 
@@ -957,6 +1072,29 @@ CREATE PROCEDURE `proc_insereMesa`(
 BEGIN
     INSERT INTO mesa(numeroMesa, localMesa) 
     VALUES(entradaNumeroMesa, entradaLocalMesa);
+END//
+DELIMITER ;
+
+-- Copiando estrutura para procedure bd_restaurante.proc_inserePedido
+DROP PROCEDURE IF EXISTS `proc_inserePedido`;
+DELIMITER //
+CREATE PROCEDURE `proc_inserePedido`(
+	IN `p_codCliente` INT,
+	IN `p_codMesa` INT,
+	IN `p_codFuncionario` INT
+)
+BEGIN
+    INSERT INTO pedido (
+        cliente_codCliente,
+        mesa_codMesa,
+        funcionario_codFuncionario,
+        datahoraPedido
+    ) VALUES (
+        p_codCliente,
+        p_codMesa,
+        p_codFuncionario,
+        NOW()  -- ou CURRENT_TIMESTAMP
+    );
 END//
 DELIMITER ;
 
@@ -1122,11 +1260,12 @@ CREATE TABLE IF NOT EXISTS `turnos` (
   `horarioInicio` time DEFAULT NULL,
   `horarioFinal` time DEFAULT NULL,
   PRIMARY KEY (`codTurnos`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
 
--- Copiando dados para a tabela bd_restaurante.turnos: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela bd_restaurante.turnos: ~2 rows (aproximadamente)
 INSERT INTO `turnos` (`codTurnos`, `horarioInicio`, `horarioFinal`) VALUES
-	(1, '09:20:00', '20:30:00');
+	(1, '09:20:00', '20:30:00'),
+	(3, '11:28:00', '17:28:00');
 
 -- Copiando estrutura para view bd_restaurante.vi_diasclientes
 DROP VIEW IF EXISTS `vi_diasclientes`;
@@ -1145,7 +1284,7 @@ DROP VIEW IF EXISTS `vi_feedback`;
 CREATE TABLE `vi_feedback` (
 	`nomeCliente` VARCHAR(1) NOT NULL COLLATE 'utf8mb3_general_ci',
 	`telefone` VARCHAR(1) NULL COLLATE 'utf8mb3_general_ci',
-	`DATA_Feedback` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
+	`DATA_Feedback` VARCHAR(1) NULL COLLATE 'utf8mb4_0900_ai_ci',
 	`nota` INT NOT NULL,
 	`descricao` VARCHAR(1) NULL COLLATE 'utf8mb3_general_ci'
 ) ENGINE=MyISAM;
@@ -1155,7 +1294,7 @@ DROP VIEW IF EXISTS `vi_funcionarioinformacoes`;
 -- Criando tabela temporária para evitar erros de dependência de VIEW
 CREATE TABLE `vi_funcionarioinformacoes` (
 	`nomeFuncionario` VARCHAR(1) NOT NULL COLLATE 'utf8mb3_general_ci',
-	`dataNascimento` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
+	`dataNascimento` VARCHAR(1) NULL COLLATE 'utf8mb4_0900_ai_ci',
 	`idade` BIGINT NULL,
 	`salarioFuncionario` DECIMAL(6,2) NOT NULL,
 	`nomeCargo` VARCHAR(1) NULL COLLATE 'utf8mb3_general_ci'
@@ -1168,8 +1307,8 @@ CREATE TABLE `vi_ingredientesfornecedores` (
 	`nomeItem` VARCHAR(1) NOT NULL COLLATE 'utf8mb3_general_ci',
 	`quant` DECIMAL(6,2) NOT NULL,
 	`descricao` VARCHAR(1) NULL COLLATE 'utf8mb3_general_ci',
-	`data_producao` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
-	`Produtos_Vencendo` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
+	`data_producao` VARCHAR(1) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`Produtos_Vencendo` VARCHAR(1) NULL COLLATE 'utf8mb4_0900_ai_ci',
 	`nomeFornecedor` VARCHAR(1) NOT NULL COLLATE 'utf8mb3_general_ci',
 	`endereco` VARCHAR(1) NULL COLLATE 'utf8mb3_general_ci'
 ) ENGINE=MyISAM;
