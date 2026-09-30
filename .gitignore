@@ -34,3 +34,14 @@ desktop.ini
 
 # ===== DEPENDÊNCIAS =====
 *.m2/
+
+# ===== SEGREDOS =====
+# O .env guarda chaves de API. NUNCA versionar.
+# Quem clonar copia o .env.example e preenche o seu.
+.env
+.env.local
+*.env
+!.env.example
+
+# Tem as senhas provisórias das contas de demonstração.
+ACESSOS.md

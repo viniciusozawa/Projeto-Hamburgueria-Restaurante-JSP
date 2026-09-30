@@ -6,10 +6,17 @@ public class Cliente {
 
     private Integer codCliente;
     private String nomeCliente;
+    private String email;
     private String cpfCliente;
     private String senhaCliente;
     private String telefone;
     private LocalDateTime dataCadastro;
+
+    /** Clicou no link que chegou por email. */
+    private boolean emailVerificado;
+
+    /** Já informou telefone e CPF na segunda tela do cadastro. */
+    private boolean cadastroCompleto;
 
     public Cliente() {}
 
@@ -18,6 +25,10 @@ public class Cliente {
 
     public String getNomeCliente() { return nomeCliente; }
     public void setNomeCliente(String nomeCliente) { this.nomeCliente = nomeCliente; }
+
+    /** É por aqui que o cliente entra no sistema. Único na tabela. */
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     public String getCpfCliente() { return cpfCliente; }
     public void setCpfCliente(String cpfCliente) { this.cpfCliente = cpfCliente; }
@@ -30,6 +41,12 @@ public class Cliente {
 
     public LocalDateTime getDataCadastro() { return dataCadastro; }
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
+    public boolean isEmailVerificado() { return emailVerificado; }
+    public void setEmailVerificado(boolean emailVerificado) { this.emailVerificado = emailVerificado; }
+
+    public boolean isCadastroCompleto() { return cadastroCompleto; }
+    public void setCadastroCompleto(boolean cadastroCompleto) { this.cadastroCompleto = cadastroCompleto; }
 
     @Override
     public String toString() {

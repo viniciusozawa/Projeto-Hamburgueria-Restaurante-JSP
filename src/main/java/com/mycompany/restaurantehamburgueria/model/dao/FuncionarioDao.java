@@ -1,10 +1,16 @@
 package com.mycompany.restaurantehamburgueria.model.dao;
 
 import com.mycompany.restaurantehamburgueria.model.entity.Funcionario;
+import com.mycompany.restaurantehamburgueria.service.Senha;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/*
+ * A senha passa por Senha.paraGravar em salvar e em alterar: texto digitado
+ * vira hash, valor que já é hash passa direto. Sem isso, editar um
+ * funcionário sem mexer na senha hashearia o hash e travaria o acesso.
+ */
 public class FuncionarioDao extends GenericoDAO<Funcionario> {
 
     private static class FuncionarioRowMapper implements RowMapper<Funcionario> {
@@ -34,7 +40,7 @@ public class FuncionarioDao extends GenericoDAO<Funcionario> {
         save(sql,
             obj.getNomeFuncionario(),
             obj.getDataNascimento(),
-            obj.getSenhaFuncionario(),
+            Senha.paraGravar(obj.getSenhaFuncionario()),
             obj.getCpfFuncionario(),
             obj.getSalarioFuncionario(),
             obj.getTurnosFuncionario().getCodTurnos(),
@@ -47,7 +53,7 @@ public class FuncionarioDao extends GenericoDAO<Funcionario> {
         save(sql,
             obj.getNomeFuncionario(),
             obj.getDataNascimento(),
-            obj.getSenhaFuncionario(),
+            Senha.paraGravar(obj.getSenhaFuncionario()),
             obj.getCpfFuncionario(),
             obj.getSalarioFuncionario(),
             obj.getTurnosFuncionario().getCodTurnos(),

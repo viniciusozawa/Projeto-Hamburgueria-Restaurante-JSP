@@ -24,6 +24,7 @@ public class ClienteController extends HttpServlet {
 
         String codIn   = request.getParameter("codCliente");
         String nomeIn  = request.getParameter("nomeCliente");
+        String emailIn = request.getParameter("email");
         String cpfIn   = request.getParameter("cpfCliente");
         String senhaIn = request.getParameter("senhaCliente");
         String telIn   = request.getParameter("telefone");
@@ -35,16 +36,16 @@ public class ClienteController extends HttpServlet {
                     encaminhar(request, response);
                     break;
                 case "cadastrar":
-                    cadastrar(request, response, nomeIn, cpfIn, senhaIn, telIn);
+                    cadastrar(request, response, nomeIn, emailIn, cpfIn, senhaIn, telIn);
                     break;
                 case "enviarAlterar":
-                    enviarAlterar(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn, dataIn);
+                    enviarAlterar(request, response, codIn, nomeIn, emailIn, cpfIn, senhaIn, telIn, dataIn);
                     break;
                 case "confirmarAlterar":
-                    confirmarAlterar(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn);
+                    confirmarAlterar(request, response, codIn, nomeIn, emailIn, cpfIn, senhaIn, telIn);
                     break;
                 case "enviarExcluir":
-                    enviarExcluir(request, response, codIn, nomeIn, cpfIn, senhaIn, telIn, dataIn);
+                    enviarExcluir(request, response, codIn, nomeIn, emailIn, cpfIn, senhaIn, telIn, dataIn);
                     break;
                 case "confirmarExcluir":
                     confirmarExcluir(request, response, codIn);
@@ -57,9 +58,10 @@ public class ClienteController extends HttpServlet {
         }
     }
 
-    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String nome, String cpf, String senha, String tel) throws IOException {
+    private void cadastrar(HttpServletRequest req, HttpServletResponse res, String nome, String email, String cpf, String senha, String tel) throws IOException {
         Cliente obj = new Cliente();
         obj.setNomeCliente(nome);
+        obj.setEmail(email);
         obj.setCpfCliente(cpf);
         obj.setSenhaCliente(senha);
         obj.setTelefone(tel);
@@ -68,9 +70,10 @@ public class ClienteController extends HttpServlet {
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/ClienteController?opcao=listar");
     }
 
-    private void enviarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cpf, String senha, String tel, String data) throws ServletException, IOException {
+    private void enviarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String email, String cpf, String senha, String tel, String data) throws ServletException, IOException {
         req.setAttribute("codCliente", cod);
         req.setAttribute("nomeCliente", nome);
+        req.setAttribute("email", email);
         req.setAttribute("cpfCliente", cpf);
         req.setAttribute("senhaCliente", senha);
         req.setAttribute("telefone", tel);
@@ -80,10 +83,11 @@ public class ClienteController extends HttpServlet {
         encaminhar(req, res);
     }
 
-    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cpf, String senha, String tel) throws IOException {
+    private void confirmarAlterar(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String email, String cpf, String senha, String tel) throws IOException {
         Cliente obj = new Cliente();
         obj.setCodCliente(Integer.valueOf(cod));
         obj.setNomeCliente(nome);
+        obj.setEmail(email);
         obj.setCpfCliente(cpf);
         obj.setSenhaCliente(senha);
         obj.setTelefone(tel);
@@ -92,9 +96,10 @@ public class ClienteController extends HttpServlet {
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/ClienteController?opcao=listar");
     }
 
-    private void enviarExcluir(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String cpf, String senha, String tel, String data) throws ServletException, IOException {
+    private void enviarExcluir(HttpServletRequest req, HttpServletResponse res, String cod, String nome, String email, String cpf, String senha, String tel, String data) throws ServletException, IOException {
         req.setAttribute("codCliente", cod);
         req.setAttribute("nomeCliente", nome);
+        req.setAttribute("email", email);
         req.setAttribute("cpfCliente", cpf);
         req.setAttribute("senhaCliente", senha);
         req.setAttribute("telefone", tel);

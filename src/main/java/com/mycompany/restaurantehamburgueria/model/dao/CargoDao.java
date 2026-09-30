@@ -1,6 +1,7 @@
 package com.mycompany.restaurantehamburgueria.model.dao;
 
 import com.mycompany.restaurantehamburgueria.model.entity.Cargo;
+import com.mycompany.restaurantehamburgueria.model.entity.Perfil;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -13,19 +14,20 @@ public class CargoDao extends GenericoDAO<Cargo> {
             Cargo obj = new Cargo();
             obj.setCodCargo(rs.getInt("codCargo"));
             obj.setNomeCargo(rs.getString("nomeCargo"));
+            obj.setPerfil(Perfil.de(rs.getString("perfil")));
             System.out.println("Mapeando: " + obj);
             return obj;
         }
     }
 
     public void salvar(Cargo obj) {
-        String sql = "INSERT INTO cargo(nomeCargo) VALUES(?)";
-        save(sql, obj.getNomeCargo());
+        String sql = "INSERT INTO cargo(nomeCargo, perfil) VALUES(?,?)";
+        save(sql, obj.getNomeCargo(), obj.getPerfil().name());
     }
 
     public void alterar(Cargo obj) {
-        String sql = "UPDATE cargo SET nomeCargo=? WHERE codCargo=?";
-        save(sql, obj.getNomeCargo(), obj.getCodCargo());
+        String sql = "UPDATE cargo SET nomeCargo=?, perfil=? WHERE codCargo=?";
+        save(sql, obj.getNomeCargo(), obj.getPerfil().name(), obj.getCodCargo());
     }
 
     public void excluir(Cargo obj) {

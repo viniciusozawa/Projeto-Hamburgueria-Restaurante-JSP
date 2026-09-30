@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cliente — Big Tites</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
@@ -35,6 +35,10 @@
                     <div class="col-md-6">
                         <label class="form-label"><i class="fa-solid fa-user me-1 text-secondary"></i>Nome</label>
                         <input type="text" class="form-control" name="nomeCliente" value="${nomeCliente}" placeholder="Nome completo" required/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><i class="fa-solid fa-envelope me-1 text-secondary"></i>Email</label>
+                        <input type="email" class="form-control" name="email" value="${email}" placeholder="usado para entrar no sistema"/>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label"><i class="fa-solid fa-id-card me-1 text-secondary"></i>CPF</label>
@@ -78,6 +82,7 @@
                         <tr>
                             <th>#</th>
                             <th>Nome</th>
+                            <th>Email</th>
                             <th>CPF</th>
                             <th>Telefone</th>
                             <th>Data Cadastro</th>
@@ -89,6 +94,7 @@
                             <tr>
                                 <td>${item.codCliente}</td>
                                 <td>${item.nomeCliente}</td>
+                                <td>${item.email}</td>
                                 <td>${item.cpfCliente}</td>
                                 <td>${item.telefone}</td>
                                 <td>${item.dataCadastro}</td>
@@ -97,6 +103,7 @@
                                         <input type="hidden" name="opcao" value="enviarAlterar"/>
                                         <input type="hidden" name="codCliente" value="${item.codCliente}"/>
                                         <input type="hidden" name="nomeCliente" value="${item.nomeCliente}"/>
+                                        <input type="hidden" name="email" value="${item.email}"/>
                                         <input type="hidden" name="cpfCliente" value="${item.cpfCliente}"/>
                                         <input type="hidden" name="senhaCliente" value="${item.senhaCliente}"/>
                                         <input type="hidden" name="telefone" value="${item.telefone}"/>
@@ -107,6 +114,7 @@
                                         <input type="hidden" name="opcao" value="enviarExcluir"/>
                                         <input type="hidden" name="codCliente" value="${item.codCliente}"/>
                                         <input type="hidden" name="nomeCliente" value="${item.nomeCliente}"/>
+                                        <input type="hidden" name="email" value="${item.email}"/>
                                         <input type="hidden" name="cpfCliente" value="${item.cpfCliente}"/>
                                         <input type="hidden" name="senhaCliente" value="${item.senhaCliente}"/>
                                         <input type="hidden" name="telefone" value="${item.telefone}"/>
@@ -126,7 +134,7 @@
 
 <footer>
     <i class="fa-solid fa-burger me-1"></i>
-    <span class="brand">Big Tites</span> &copy; 2024 &mdash; Sistema de Gerenciamento
+    <span class="brand">Big Tites</span> &mdash; painel de gerenciamento
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
