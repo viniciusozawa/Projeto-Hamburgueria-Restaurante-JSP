@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.CardapioDao;
 import com.mycompany.restaurantehamburgueria.model.dao.ClienteDao;
 import com.mycompany.restaurantehamburgueria.model.dao.FuncionarioDao;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(WebConstante.BASE_PATH + "/PedidoController")
@@ -78,6 +80,8 @@ public class PedidoController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -93,7 +97,7 @@ public class PedidoController extends HttpServlet {
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
             String codCliente, String codMesa, String codFuncionario) throws IOException {
         dao.salvar(montar(codCliente, codMesa, codFuncionario));
-        req.getSession().setAttribute("flash", "Pedido cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Pedido cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/PedidoController?opcao=listar");
     }
 
@@ -113,7 +117,7 @@ public class PedidoController extends HttpServlet {
         Pedido obj = montar(codCliente, codMesa, codFuncionario);
         obj.setCodpedido(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Pedido alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Pedido alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/PedidoController?opcao=listar");
     }
 
@@ -131,8 +135,14 @@ public class PedidoController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Pedido obj = new Pedido();
         obj.setCodpedido(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Pedido excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Pedido excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/PedidoController?opcao=listar");
     }
 
@@ -145,7 +155,8 @@ public class PedidoController extends HttpServlet {
         Pedido pedido = dao.buscarPorId(codpedido);
 
         if (pedido == null) {
-            req.getSession().setAttribute("flash", "Pedido nao encontrado.");
+            req.getSession().setAttribute("flash", "Pedido não encontrado.");
+            req.getSession().setAttribute("flashTipo", "alerta");
             res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/PedidoController?opcao=listar");
             return;
         }
@@ -165,7 +176,7 @@ public class PedidoController extends HttpServlet {
         item.setQuantidade(Integer.valueOf(quantidade));
 
         itemDao.salvar(item);
-        req.getSession().setAttribute("flash", "Item adicionado ao pedido!");
+        req.getSession().setAttribute("flash", "Item adicionado ao pedido.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH
                 + "/PedidoController?opcao=abrirItens&codpedido=" + cod);
     }
@@ -174,8 +185,14 @@ public class PedidoController extends HttpServlet {
             String cod, String codItem) throws IOException {
         PedidoPorCardapio item = new PedidoPorCardapio();
         item.setCodPedidoPorCardapio(Integer.valueOf(codItem));
-        itemDao.excluir(item);
-        req.getSession().setAttribute("flash", "Item removido do pedido!");
+        try {
+            itemDao.excluir(item);
+            req.getSession().setAttribute("flash", "Item tirado do pedido.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH
                 + "/PedidoController?opcao=abrirItens&codpedido=" + cod);
     }
@@ -191,9 +208,22 @@ public class PedidoController extends HttpServlet {
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         lerFlash(request);
-        // A consulta ja traz a quantidade de itens e o total de cada pedido
-        List<Pedido> lista = dao.buscarTodos();
-        request.setAttribute("pedidos", lista);
+        // A consulta ja traz itens, total e quanto foi pago de cada pedido.
+        // Nada é apagado ao dar baixa: o pedido pago só muda de lista.
+        List<Pedido> abertos = new ArrayList<>();
+        List<Pedido> finalizados = new ArrayList<>();
+        double arrecadado = 0;
+        for (Pedido p : dao.buscarRecentesPrimeiro()) {
+            if (p.isFinalizado()) {
+                finalizados.add(p);
+            } else {
+                abertos.add(p);
+            }
+            arrecadado += p.getValorRecebido();
+        }
+        request.setAttribute("pedidosAbertos", abertos);
+        request.setAttribute("pedidosFinalizados", finalizados);
+        request.setAttribute("totalArrecadado", arrecadado);
         request.setAttribute("clientes", clienteDao.buscarTodos());
         request.setAttribute("mesas", mesaDao.buscarTodos());
         request.setAttribute("funcionarios", funcionarioDao.buscarTodos());

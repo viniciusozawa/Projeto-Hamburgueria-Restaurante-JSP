@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body class="vitrine balcao">
 
@@ -85,19 +85,18 @@
             <div class="campo">
                 <label for="telefone"><i class="fa-solid fa-phone" aria-hidden="true"></i>Telefone</label>
                 <input type="tel" id="telefone" name="telefone" value="${telefoneDigitado}"
-                       placeholder="(35) 9 0000-0000" inputmode="tel"
+                       placeholder="35 99999-9999" data-mascara="celular"
                        autocomplete="tel" autofocus required>
             </div>
 
             <div class="campo">
                 <label for="cpf"><i class="fa-solid fa-id-card" aria-hidden="true"></i>CPF</label>
                 <input type="text" id="cpf" name="cpfCliente" value="${cpfDigitado}"
-                       placeholder="000.000.000-00" inputmode="numeric"
-                       maxlength="14" required>
-                <p class="campo-dica">Pode digitar só os números.</p>
+                       placeholder="000.000.000-00" data-mascara="cpf" required>
+                <p class="campo-dica">Digite só os números: os pontos e o traço aparecem sozinhos.</p>
             </div>
 
-            <button class="btn-ficha" type="submit">
+            <button class="btn-ficha" type="submit" data-ocupado="Salvando…">
                 <i class="fa-solid fa-check" aria-hidden="true"></i>Concluir cadastro
             </button>
 
@@ -109,7 +108,8 @@
 
 </div>
 
-<script src="${pageContext.request.contextPath}/js/balcao.js"></script>
+<script src="${pageContext.request.contextPath}/js/balcao.js?v=${VERSAO}"></script>
+<script src="${pageContext.request.contextPath}/js/mascaras.js?v=${VERSAO}"></script>
 
 </body>
 </html>

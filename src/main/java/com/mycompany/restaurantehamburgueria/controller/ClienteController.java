@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.ClienteDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Cliente;
 import com.mycompany.restaurantehamburgueria.service.WebConstante;
@@ -25,9 +26,9 @@ public class ClienteController extends HttpServlet {
         String codIn   = request.getParameter("codCliente");
         String nomeIn  = request.getParameter("nomeCliente");
         String emailIn = request.getParameter("email");
-        String cpfIn   = request.getParameter("cpfCliente");
+        String cpfIn   = apenasDigitos(request.getParameter("cpfCliente"));
         String senhaIn = request.getParameter("senhaCliente");
-        String telIn   = request.getParameter("telefone");
+        String telIn   = apenasDigitos(request.getParameter("telefone"));
         String dataIn  = request.getParameter("dataCadastro");
 
         try {
@@ -54,6 +55,8 @@ public class ClienteController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -66,7 +69,7 @@ public class ClienteController extends HttpServlet {
         obj.setSenhaCliente(senha);
         obj.setTelefone(tel);
         dao.salvar(obj);
-        req.getSession().setAttribute("flash", "Cliente cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Cliente cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/ClienteController?opcao=listar");
     }
 
@@ -92,7 +95,7 @@ public class ClienteController extends HttpServlet {
         obj.setSenhaCliente(senha);
         obj.setTelefone(tel);
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Cliente alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Cliente alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/ClienteController?opcao=listar");
     }
 
@@ -112,9 +115,20 @@ public class ClienteController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Cliente obj = new Cliente();
         obj.setCodCliente(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Cliente excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Cliente excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/ClienteController?opcao=listar");
+    }
+
+    /** Guarda CPF e telefone só com dígitos: a máscara é assunto da tela (js/mascaras.js). */
+    private static String apenasDigitos(String v) {
+        return v == null ? null : v.replaceAll("[^0-9]", "");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

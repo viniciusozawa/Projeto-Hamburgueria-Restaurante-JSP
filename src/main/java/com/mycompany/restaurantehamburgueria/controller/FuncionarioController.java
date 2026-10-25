@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.CargoDao;
 import com.mycompany.restaurantehamburgueria.model.dao.FuncionarioDao;
 import com.mycompany.restaurantehamburgueria.model.dao.TurnosDao;
@@ -33,7 +34,7 @@ public class FuncionarioController extends HttpServlet {
         String nomeIn      = request.getParameter("nomeFuncionario");
         String nascIn      = request.getParameter("dataNascimento");
         String senhaIn     = request.getParameter("senhaFuncionario");
-        String cpfIn       = request.getParameter("cpfFuncionario");
+        String cpfIn       = apenasDigitos(request.getParameter("cpfFuncionario"));
         String salarioIn   = request.getParameter("salarioFuncionario");
         String codTurnosIn = request.getParameter("codTurnos");
         String codCargoIn  = request.getParameter("codCargo");
@@ -62,6 +63,8 @@ public class FuncionarioController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -81,7 +84,7 @@ public class FuncionarioController extends HttpServlet {
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
             String nome, String nasc, String senha, String cpf, String salario, String codTurnos, String codCargo) throws IOException {
         dao.salvar(montar(nome, nasc, senha, cpf, salario, codTurnos, codCargo));
-        req.getSession().setAttribute("flash", "Funcionario cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Funcionário cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FuncionarioController?opcao=listar");
     }
 
@@ -105,7 +108,7 @@ public class FuncionarioController extends HttpServlet {
         Funcionario obj = montar(nome, nasc, senha, cpf, salario, codTurnos, codCargo);
         obj.setCodFuncionario(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Funcionario alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Funcionário alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FuncionarioController?opcao=listar");
     }
 
@@ -127,9 +130,20 @@ public class FuncionarioController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Funcionario obj = new Funcionario();
         obj.setCodFuncionario(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Funcionario excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Funcionário excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/FuncionarioController?opcao=listar");
+    }
+
+    /** Guarda o CPF só com dígitos: a máscara é assunto da tela (js/mascaras.js). */
+    private static String apenasDigitos(String v) {
+        return v == null ? null : v.replaceAll("[^0-9]", "");
     }
 
     private void encaminhar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

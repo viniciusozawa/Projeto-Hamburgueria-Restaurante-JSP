@@ -18,6 +18,27 @@ public class GenericoDAO<T> {
 
     private final ConnectionFactory connectionFactory = ConnectionFactory.getInstance();
 
+    /**
+     * DELETE que avisa quando o banco recusa.
+     *
+     * O save() engole a SQLException (só imprime), então uma exclusão barrada
+     * por chave estrangeira parecia ter dado certo e a tela dizia "excluído
+     * com sucesso" sem ter apagado nada. Aqui a recusa vira ExclusaoRecusada,
+     * e o controlador mostra o motivo.
+     */
+    public void remover(String comandoSql, Object... parametros) {
+        try (Connection con = connectionFactory.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(comandoSql)) {
+            for (int i = 0; i < parametros.length; i++) {
+                pstmt.setObject(i + 1, parametros[i]);
+            }
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ExclusaoRecusada(e);
+        }
+    }
+
     public void save(String comandoSql, Object... parametros) {
         Connection con = null;
         PreparedStatement pstmt = null;

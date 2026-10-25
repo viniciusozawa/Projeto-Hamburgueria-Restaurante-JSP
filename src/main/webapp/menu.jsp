@@ -2,7 +2,12 @@
      folhas de estilo, então aqui não vai documento nem diretiva de página.
 
      Os onze módulos não cabem numa linha só. Ficam à mostra os que se usa
-     durante o serviço; o resto vai para o menu "Mais". --%>
+     durante o serviço; o resto vai para o menu "Mais".
+
+     O pageEncoding abaixo é obrigatório mesmo sendo fragmento: cada arquivo
+     incluído é lido com a própria codificação, e sem ela o servidor lia este
+     como ISO-8859-1 ("Cardápio" saía "CardÃ¡pio" em todo o painel). --%>
+<%@page pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
 
 <nav class="navbar navbar-expand-lg navbar-dark px-4" id="mainNav">
@@ -98,6 +103,16 @@
         </ul>
     </div>
 </nav>
+
+<%-- Tipo do aviso que veio do controlador ("alerta" quando o banco recusou
+     uma exclusão). O painel.js lê para pintar o ticket de vermelho. --%>
+<c:if test="${not empty sessionScope.flashTipo}">
+    <span id="flashTipo" data-tipo="${sessionScope.flashTipo}" hidden></span>
+    <c:remove var="flashTipo" scope="session"/>
+</c:if>
+
+<%-- defer: roda depois do bootstrap.bundle que cada tela carrega no fim do <body> --%>
+<script defer src="${pageContext.request.contextPath}/js/painel.js?v=${VERSAO}"></script>
 
 <script>
     /* Marca a tela atual. "Painel" e "Sair" ficam de fora: um é destino fixo,

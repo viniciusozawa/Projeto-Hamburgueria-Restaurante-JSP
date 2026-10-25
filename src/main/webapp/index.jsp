@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body class="vitrine">
 
@@ -349,7 +349,10 @@
             <a href="#" aria-label="Instagram da Big Tites"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
             <a href="#" aria-label="WhatsApp da Big Tites"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
             <c:choose>
-                <c:when test="${not empty sessionScope.user}">
+                <c:when test="${sessionScope.usuario.cliente}">
+                    <a href="${pageContext.request.contextPath}${URL_BASE}/PerfilControlador" aria-label="Minha conta"><i class="fa-solid fa-user" aria-hidden="true"></i></a>
+                </c:when>
+                <c:when test="${not empty sessionScope.usuario}">
                     <a href="${pageContext.request.contextPath}/painel.jsp" aria-label="Abrir o painel"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></a>
                 </c:when>
                 <c:otherwise>

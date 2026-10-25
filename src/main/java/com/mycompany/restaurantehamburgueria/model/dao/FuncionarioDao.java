@@ -64,7 +64,7 @@ public class FuncionarioDao extends GenericoDAO<Funcionario> {
 
     public void excluir(Funcionario obj) {
         String sql = "DELETE FROM funcionario WHERE codFuncionario=?";
-        save(sql, obj.getCodFuncionario());
+        remover(sql, obj.getCodFuncionario());
     }
 
     public List<Funcionario> buscarTodos() {

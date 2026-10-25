@@ -1,5 +1,7 @@
 package com.mycompany.restaurantehamburgueria.model.entity;
 
+import com.mycompany.restaurantehamburgueria.service.Permissoes;
+
 /**
  * Quem está logado.
  *
@@ -113,6 +115,15 @@ public class Usuario {
     public boolean isPodeAtenderSalao() { return perfil.podeAtenderSalao(); }
     public boolean isPodeVerPreparo()   { return perfil.podeVerPreparo(); }
     public boolean isTemPainel()        { return perfil.temPainel(); }
+
+    /**
+     * Esta pessoa pode executar esta ação? Para esconder na JSP o botão que o
+     * AuthFilter barraria: ${usuario.pode('MesaController', 'enviarExcluir')}.
+     * A regra mora em Permissoes, a mesma que o filtro consulta.
+     */
+    public boolean pode(String controlador, String opcao) {
+        return Permissoes.permite(perfil, controlador, opcao);
+    }
 
     @Override
     public String toString() {

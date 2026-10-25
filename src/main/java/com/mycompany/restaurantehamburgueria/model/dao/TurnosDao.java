@@ -41,7 +41,7 @@ public class TurnosDao extends GenericoDAO<Turnos> {
 
     public void excluir(Turnos obj) {
         String sql = "DELETE FROM turnos WHERE codTurnos=?";
-        save(sql, obj.getCodTurnos());
+        remover(sql, obj.getCodTurnos());
     }
 
     public List<Turnos> buscarTodos() {

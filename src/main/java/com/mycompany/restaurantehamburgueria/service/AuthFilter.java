@@ -20,10 +20,6 @@ import com.mycompany.restaurantehamburgueria.model.entity.Perfil;
 import com.mycompany.restaurantehamburgueria.model.entity.Usuario;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-//import com.mycompany.restaurantehamburgueria.model.entity.Perfil;
-import com.mycompany.restaurantehamburgueria.model.entity.Usuario;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -47,6 +43,12 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        // Acentos: sem isto o servidor lê o formulário como ISO-8859-1 e
+        // "João" vira "JoÃ£o" no banco. Tem que vir antes de qualquer
+        // getParameter (o "opcao" logo abaixo já trava a codificação).
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         // Obter o caminho da requisição
@@ -64,7 +66,7 @@ public class AuthFilter implements Filter {
             if (usuario == null) {
                 httpResponse.sendRedirect(httpRequest.getContextPath() + "/login.jsp");
 
-            } else if (!podeAcessar(path, usuario.getPerfil())) {
+            } else if (!podeAcessar(path, httpRequest.getParameter("opcao"), usuario.getPerfil())) {
                 // Esconder o item do menu não basta: sem esta checagem bastaria
                 // digitar a URL do controlador para entrar onde não devia.
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN,
@@ -111,12 +113,15 @@ public class AuthFilter implements Filter {
     }
 
     /**
-     * Quem pode abrir cada controlador.
+     * Quem pode abrir cada caminho.
      *
-     * ADMIN abre tudo. Os demais recebem só o que o trabalho exige — e o
-     * padrão é negar: um caminho desconhecido não passa por engano.
+     * Controladores seguem a tabela de Permissoes, ação por ação. Uma JSP
+     * aberta direto pela URL só
+     * passa nos dois casos abaixo: as telas de CRUD chegam por forward do
+     * controlador, que não passa por este filtro, então digitar
+     * /CadastroFornecedor.jsp não tem motivo legítimo.
      */
-    private boolean podeAcessar(String path, Perfil perfil) {
+    private boolean podeAcessar(String path, String opcao, Perfil perfil) {
         if (perfil == null) {
             return false;
         }
@@ -124,31 +129,18 @@ public class AuthFilter implements Filter {
             return true;
         }
 
-        // Telas do cliente, abertas a qualquer pessoa logada.
-        if (path.equalsIgnoreCase("/completar-cadastro.jsp")
-                || path.equalsIgnoreCase(WebConstante.BASE_PATH + "/PerfilControlador")) {
-            return true;
-        }
-
         if (!path.startsWith(WebConstante.BASE_PATH + "/")) {
-            return perfil.temPainel() || perfil == Perfil.CLIENTE;
+            if (path.equalsIgnoreCase("/painel.jsp")) {
+                return perfil.temPainel();
+            }
+            if (path.equalsIgnoreCase("/completar-cadastro.jsp")) {
+                return perfil == Perfil.CLIENTE;
+            }
+            return false;
         }
 
         String controlador = path.substring(path.lastIndexOf('/') + 1);
-
-        switch (perfil) {
-            case GARCOM:
-                return controlador.equals("PedidoController")
-                    || controlador.equals("PagamentoController")
-                    || controlador.equals("MesaController")
-                    || controlador.equals("CardapioController");
-            case COZINHA:
-                return controlador.equals("PedidoController")
-                    || controlador.equals("CardapioController")
-                    || controlador.equals("IngredienteController");
-            default:
-                return false;
-        }
+        return Permissoes.permite(perfil, controlador, opcao);
     }
 
     @Override

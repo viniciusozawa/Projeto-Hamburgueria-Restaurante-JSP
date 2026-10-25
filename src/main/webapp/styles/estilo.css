@@ -25,6 +25,10 @@
     --success:    #1F7A4D;
     --danger:     var(--pimenta);
     --info:       #2A6F7F;
+    /* tons de papel do painel e mostarda para texto sobre claro */
+    --papel-claro:    #FBF9F4;
+    --papel-linha:    #ECE7DB;
+    --mostarda-tinta: #8A5E05;
 
     /* placa pintada e papel não têm canto de 10px */
     --radius:     3px;
@@ -134,10 +138,11 @@ body {
 
 /* ===== MENSAGEM ===== */
 .mensagem {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 8px;
+    background: rgba(31,122,77,0.1);
+    color: #17563A;
+    border: none;
+    border-left: 3px solid var(--success);
+    border-radius: 0 6px 6px 0;
     padding: 11px 18px;
     margin-bottom: 20px;
     font-weight: 500;
@@ -172,7 +177,7 @@ body {
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(232,86,42,0.15);
+    box-shadow: 0 0 0 0.2rem rgba(232,163,23,0.22);
     outline: none;
 }
 
@@ -193,11 +198,11 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .btn-salvar {
-    background: var(--success);
+    background: var(--esmalte);
     color: white;
     border: none;
     padding: 9px 24px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-weight: 600;
     font-size: 0.88rem;
     cursor: pointer;
@@ -208,14 +213,14 @@ input[type=number]::-webkit-outer-spin-button {
     text-decoration: none;
     font-family: inherit;
 }
-.btn-salvar:hover { background: #219a52; color: white; transform: translateY(-1px); }
+.btn-salvar:hover { background: var(--esmalte-claro); color: white; }
 
 .btn-cancelar {
-    background: var(--muted);
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border);
     padding: 9px 24px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-weight: 600;
     font-size: 0.88rem;
     cursor: pointer;
@@ -226,12 +231,12 @@ input[type=number]::-webkit-outer-spin-button {
     gap: 7px;
     font-family: inherit;
 }
-.btn-cancelar:hover { background: #495057; color: white; }
+.btn-cancelar:hover { background: var(--papel-linha); color: var(--text); }
 
 .btn-alterar {
-    background: var(--info);
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--esmalte);
+    border: 1.5px solid var(--esmalte-claro);
     padding: 5px 12px;
     border-radius: 6px;
     cursor: pointer;
@@ -243,12 +248,12 @@ input[type=number]::-webkit-outer-spin-button {
     gap: 5px;
     font-family: inherit;
 }
-.btn-alterar:hover { background: #2179b5; }
+.btn-alterar:hover { background: var(--esmalte); border-color: var(--esmalte); color: var(--papel); }
 
 .btn-excluir {
-    background: var(--danger);
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--pimenta);
+    border: 1.5px solid var(--pimenta);
     padding: 5px 12px;
     border-radius: 6px;
     cursor: pointer;
@@ -260,7 +265,7 @@ input[type=number]::-webkit-outer-spin-button {
     gap: 5px;
     font-family: inherit;
 }
-.btn-excluir:hover { background: #c0392b; }
+.btn-excluir:hover { background: var(--pimenta); color: white; }
 
 /* ===== TABELA ===== */
 .table-wrapper { overflow-x: auto; }
@@ -273,10 +278,15 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .table thead th {
-    background: #2d2d44;
-    color: white;
+    background: var(--papel);
+    color: var(--muted);
     padding: 12px 15px;
-    font-weight: 600;
+    font-family: var(--fonte-comanda);
+    font-size: 0.74rem;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-bottom: 2px solid var(--esmalte) !important;
     text-align: left;
     white-space: nowrap;
     border: none;
@@ -285,12 +295,12 @@ input[type=number]::-webkit-outer-spin-button {
 .table tbody td {
     padding: 10px 15px;
     color: var(--text);
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--papel-linha);
     vertical-align: middle;
 }
 
-.table tbody tr:nth-child(even) td { background: #fafafa; }
-.table tbody tr:hover td { background: rgba(243,156,18,0.07) !important; }
+.table tbody tr:nth-child(even) td { background: var(--papel-claro); }
+.table tbody tr:hover td { background: rgba(232,163,23,0.09) !important; }
 
 /* ===== PEDIDOS — LISTAGEM ===== */
 .card-header .header-hint {
@@ -309,15 +319,15 @@ input[type=number]::-webkit-outer-spin-button {
 
 .badge-qtd {
     display: inline-block;
-    background: rgba(243,156,18,0.16);
-    color: #b9770e;
+    background: rgba(232,163,23,0.18);
+    color: var(--mostarda-tinta);
     border-radius: 20px;
     padding: 3px 11px;
     font-size: 0.75rem;
     font-weight: 700;
     white-space: nowrap;
 }
-.badge-qtd.vazio { background: #eceff1; color: var(--muted); }
+.badge-qtd.vazio { background: var(--papel-linha); color: var(--muted); }
 
 .valor-total { font-weight: 700; color: var(--success); white-space: nowrap; }
 
@@ -339,9 +349,9 @@ input[type=number]::-webkit-outer-spin-button {
     text-decoration: none;
     font-family: inherit;
 }
-.btn-itens:hover { background: #c9451e; color: white; }
+.btn-itens:hover { background: var(--esmalte); color: white; }
 .btn-itens.ativo { background: var(--dark); }
-.btn-itens.ativo:hover { background: #34344e; }
+.btn-itens.ativo:hover { background: var(--esmalte-fundo); }
 
 /* ===== TELA DE ITENS DO PEDIDO ===== */
 
@@ -357,13 +367,14 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .breadcrumb-item a:hover { color: var(--primary); }
 .breadcrumb-item.active { color: var(--text); font-weight: 600; }
-.breadcrumb-item + .breadcrumb-item::before { color: #c3cad1; }
+.breadcrumb-item + .breadcrumb-item::before { color: var(--border); }
 
 /* --- alerta --- */
 .alert-success {
-    background: #d4edda;
-    color: #155724;
-    border-radius: 8px;
+    background: rgba(31,122,77,0.1);
+    color: #17563A;
+    border-radius: 0 6px 6px 0;
+    border-left: 3px solid var(--success) !important;
     font-size: 0.88rem;
     font-weight: 500;
     padding: 12px 18px;
@@ -388,7 +399,7 @@ input[type=number]::-webkit-outer-spin-button {
     right: -30px;
     width: 190px;
     height: 190px;
-    background: radial-gradient(circle, rgba(232,86,42,0.28) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(232,163,23,0.22) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -400,7 +411,7 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 10px 15px;
     border-radius: 10px;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(232,86,42,0.35);
+    box-shadow: 0 4px 12px rgba(11,34,25,0.3);
 }
 
 .hero-titulo {
@@ -442,8 +453,8 @@ input[type=number]::-webkit-outer-spin-button {
     background: var(--secondary);
     border-color: var(--secondary);
 }
-.hero-box.destaque:hover  { background: #e8930f; }
-.hero-box.destaque span   { color: rgba(30,30,46,0.62); }
+.hero-box.destaque:hover  { background: #D4940F; }
+.hero-box.destaque span   { color: rgba(11,34,25,0.66); }
 .hero-box.destaque span i { color: var(--dark); }
 .hero-box.destaque strong { color: var(--dark); font-size: 1.16rem; font-weight: 800; }
 
@@ -473,7 +484,7 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 8px 0 0 8px;
 }
 .campo-qtd .input-group-text {
-    background: #f1f3f5;
+    background: var(--papel-linha);
     border: 1.5px solid var(--border);
     border-left: none;
     border-radius: 0 8px 8px 0;
@@ -485,7 +496,7 @@ input[type=number]::-webkit-outer-spin-button {
 .form-text { font-size: 0.72rem; color: var(--muted); }
 
 .btn-adicionar {
-    background: var(--success);
+    background: var(--esmalte);
     color: white;
     border: none;
     border-radius: 8px;
@@ -496,14 +507,12 @@ input[type=number]::-webkit-outer-spin-button {
     transition: 0.2s;
 }
 .btn-adicionar:hover {
-    background: #219a52;
+    background: var(--esmalte-claro);
     color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(39,174,96,0.28);
 }
 
 .card-footer-dica {
-    background: #fbfbfc;
+    background: var(--papel-claro);
     border-top: 1px solid var(--border);
     border-radius: 0 0 var(--radius) var(--radius);
     padding: 13px 18px;
@@ -521,7 +530,7 @@ input[type=number]::-webkit-outer-spin-button {
     height: 38px;
     flex: 0 0 38px;
     border-radius: 50%;
-    background: rgba(232,86,42,0.11);
+    background: rgba(232,163,23,0.16);
     color: var(--primary);
     display: flex;
     align-items: center;
@@ -540,8 +549,8 @@ input[type=number]::-webkit-outer-spin-button {
 .badge-item {
     display: inline-block;
     min-width: 42px;
-    background: rgba(52,152,219,0.13);
-    color: #1f6f9c;
+    background: rgba(42,111,127,0.13);
+    color: var(--info);
     border-radius: 20px;
     padding: 4px 10px;
     font-size: 0.76rem;
@@ -554,7 +563,7 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: #f1f3f5;
+    background: var(--papel-linha);
     color: var(--muted);
     font-size: 0.72rem;
     transition: 0.18s;
@@ -572,9 +581,9 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 38px 16px;
     border: 1.5px dashed var(--border);
     border-radius: 10px;
-    background: #fcfcfd;
+    background: var(--papel-claro);
 }
-.itens-vazio i { display: block; font-size: 2rem; color: #d8dde1; margin-bottom: 12px; }
+.itens-vazio i { display: block; font-size: 2rem; color: var(--border); margin-bottom: 12px; }
 .itens-vazio p { font-size: 0.92rem; font-weight: 600; color: var(--text); }
 .itens-vazio small { font-size: 0.78rem; }
 
@@ -750,14 +759,14 @@ footer .brand { color: var(--secondary); font-weight: 600; }
     align-items: center;
     gap: 14px;
     height: 100%;
-    transition: border-left-color 0.18s, transform 0.18s, box-shadow 0.18s;
+    transition: border-left-color 0.18s, box-shadow 0.18s;
 }
 
 .module-card:hover {
     border-left-color: var(--mostarda);
-    transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(11,34,25,0.1);
 }
+.module-card:focus-visible { outline: 3px solid var(--mostarda); outline-offset: 2px; }
 
 .module-card .mod-icon {
     font-size: 1.2rem;
@@ -2063,3 +2072,616 @@ body.balcao { background: var(--esmalte); }
     border-bottom: 1px solid #C3BEB0;
 }
 .campo-esqueci a:hover { color: #1B1B18; border-bottom-color: var(--mostarda); }
+
+/* ===== MINHA CONTA (área do cliente) ===== */
+.conta { padding: 56px 0 88px; }
+
+.conta-grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 390px;
+    gap: 56px;
+    align-items: start;
+}
+
+.conta-subtitulo {
+    font-family: var(--fonte-placa);
+    font-weight: 600;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--papel);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 30px;
+}
+.conta-subtitulo i { color: var(--mostarda); }
+
+/* cada pedido é uma comanda impressa, parada na mesa */
+.conta-pedidos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px 26px;
+}
+
+.conta-comanda {
+    position: relative;
+    background: var(--papel);
+    color: #2A2A26;
+    font-family: var(--fonte-comanda);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    padding: 18px 20px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    transform: rotate(-0.7deg);
+}
+.conta-comanda:nth-child(even) { transform: rotate(0.6deg); }
+
+.conta-comanda::before,
+.conta-comanda::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 9px;
+    background-image: radial-gradient(circle at 6px 9px, transparent 5px, var(--papel) 5.5px);
+    background-size: 12px 9px;
+    background-repeat: repeat-x;
+}
+.conta-comanda::before { top: -9px; transform: scaleY(-1); }
+.conta-comanda::after  { bottom: -9px; }
+
+.conta-vazio {
+    border: 1px dashed rgba(243,238,226,0.25);
+    padding: 40px 28px;
+    text-align: center;
+}
+.conta-vazio i { font-size: 2rem; color: var(--mostarda); }
+.conta-vazio p { margin: 14px auto 18px; max-width: 360px; }
+
+.conta-link {
+    color: var(--mostarda);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 2px solid currentColor;
+}
+
+.conta-ficha { max-width: none; }
+.conta-ficha .campo label i { margin-right: 6px; }
+.conta-ficha input[readonly] {
+    color: #8A8478;
+    border-bottom-style: dashed;
+    cursor: not-allowed;
+}
+.conta-ficha .ficha-rodape { line-height: 1.9; }
+
+@media (max-width: 960px) {
+    .conta-grade { grid-template-columns: 1fr; gap: 48px; }
+    .conta-ficha { max-width: 480px; }
+}
+@media (max-width: 720px) {
+    .conta { padding: 36px 0 64px; }
+}
+
+/* ===== PAINEL: perfil que só consulta ===== */
+.somente-consulta {
+    margin: 0;
+    padding: 12px 14px;
+    border-left: 3px solid var(--gordura);
+    background: rgba(18,59,46,0.06);
+    color: var(--muted);
+    font-size: 0.92rem;
+    border-radius: 0 6px 6px 0;
+}
+.somente-consulta i { color: var(--esmalte-claro); margin-right: 6px; }
+
+/* ============================================================
+   PAINEL — interação (js/painel.js)
+   ============================================================ */
+
+/* --- ticket: o aviso sai da impressora, como a comanda ---
+   .ticket-pilha é a boca da impressora (a régua escura no topo);
+   cada .ticket-boca esconde o papel até ele descer. */
+.ticket-pilha {
+    position: fixed;
+    top: 78px;
+    right: 24px;
+    z-index: 1090;
+    width: min(320px, calc(100vw - 32px));
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ticket-pilha::before {
+    content: '';
+    height: 7px;
+    border-radius: 4px;
+    background: var(--esmalte-fundo);
+    box-shadow: inset 0 -2px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.25);
+    position: relative;
+    z-index: 2;
+}
+.ticket-boca {
+    overflow: hidden;
+    margin: -10px -24px 0;
+    padding: 0 24px 30px;
+}
+
+.ticket.toast {
+    position: relative;
+    width: 100%;
+    background: var(--papel);
+    color: #2A2A26;
+    font-family: var(--fonte-comanda);
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 8px 14px rgba(11,34,25,0.22);
+    padding: 12px 40px 14px 16px;
+    animation: ticket-sai 0.55s cubic-bezier(.2,.8,.25,1) both;
+}
+.ticket.toast::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -9px;
+    height: 9px;
+    background-image: radial-gradient(circle at 6px 9px, transparent 5px, var(--papel) 5.5px);
+    background-size: 12px 9px;
+    background-repeat: repeat-x;
+}
+.ticket-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #8A8478;
+    border-bottom: 1px dashed #B9B4A6;
+    padding-bottom: 6px;
+    margin: 0 0 8px;
+}
+.ticket-texto {
+    display: flex;
+    gap: 9px;
+    align-items: baseline;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0;
+}
+.ticket-texto i { color: var(--success); }
+.ticket-alerta .ticket-texto i { color: var(--pimenta); }
+.ticket-fechar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: #8A8478;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.ticket-fechar:hover { background: rgba(0,0,0,0.06); color: #1B1B18; }
+.ticket-fechar:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 1px; }
+
+@keyframes ticket-sai {
+    from { transform: translateY(-105%); }
+    to   { transform: translateY(0); }
+}
+
+/* --- modal de exclusão: uma ficha de papel sobre o painel --- */
+.modal-comanda .modal-content {
+    background: var(--papel);
+    color: #2A2A26;
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 24px 60px rgba(11,34,25,0.4);
+}
+.modal-comanda .modal-body { padding: 28px 28px 8px; }
+.modal-comanda .modal-titulo {
+    font-family: var(--fonte-placa);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: #1B1B18;
+    margin: 0 0 16px;
+}
+.modal-alvo {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 16px;
+    font-family: var(--fonte-comanda);
+    font-size: 0.9rem;
+    border-top: 1px dashed #B9B4A6;
+    border-bottom: 1px dashed #B9B4A6;
+    padding: 12px 0;
+    margin: 0 0 14px;
+}
+.modal-alvo dt { font-weight: 400; color: #6E6E64; }
+.modal-alvo dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.modal-aviso { font-size: 0.86rem; color: #8C2113; margin: 0; }
+.modal-comanda .modal-footer {
+    border-top: none;
+    padding: 12px 28px 26px;
+    gap: 10px;
+}
+.modal-comanda .btn-excluir { padding: 9px 22px; font-size: 0.88rem; border-radius: 999px; background: var(--pimenta); color: white; }
+.modal-comanda .btn-excluir:hover { background: #A62B18; }
+.modal-comanda .btn-cancelar { padding: 9px 22px; }
+.modal-backdrop.show { opacity: 0.6; background: var(--esmalte-fundo); }
+
+/* --- botão ocupado (Salvando…) --- */
+button[aria-busy="true"] { cursor: progress; opacity: 0.85; transform: none !important; }
+
+/* --- procurar na lista --- */
+.procurar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.procurar > i {
+    position: absolute;
+    left: 12px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+.procurar .form-control { max-width: 320px; padding-left: 34px; }
+.procurar-conta { font-size: 0.82rem; color: var(--muted); }
+.procurar-vazio td { text-align: center; color: var(--muted); padding: 22px 15px !important; }
+
+/* foco visível em tudo que é clicável no painel */
+.btn-salvar:focus-visible,
+.btn-cancelar:focus-visible,
+.btn-alterar:focus-visible,
+.btn-excluir:focus-visible { outline: 3px solid var(--mostarda); outline-offset: 2px; }
+
+@media (max-width: 576px) {
+    .ticket-pilha { right: 16px; top: 70px; }
+    .modal-comanda .modal-footer { flex-direction: column-reverse; align-items: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ticket.toast { animation: none; }
+    .modal.fade .modal-dialog { transition: none; }
+}
+/* sem ticket na pilha, a impressora some junto */
+.ticket-pilha:empty { display: none; }
+/* o que o banco apaga junto: aviso antes de confirmar */
+.modal-cascata {
+    font-size: 0.86rem;
+    color: var(--mostarda-tinta);
+    background: rgba(232,163,23,0.14);
+    border-left: 3px solid var(--mostarda);
+    padding: 9px 12px;
+    margin: 0 0 12px;
+}
+.ticket-alerta .ticket-texto { color: #8C2113; }
+
+/* ===== PAINEL — TRILHO DE COMANDAS =====
+   A barra de metal onde a cozinha pendura os pedidos do dia. É o único
+   elemento "de cena" do painel; o resto fica quieto. */
+.trilho { padding: 40px 0 0; }
+.trilho-interno { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.trilho-cabeca {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.trilho-cabeca .bloco-nome { flex: 1; min-width: 200px; margin-bottom: 14px; }
+.trilho-resumo {
+    font-family: var(--fonte-comanda);
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0 0 14px;
+}
+
+.trilho-barra {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(#2E5546, var(--esmalte-fundo));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 3px 6px rgba(11,34,25,0.25);
+    position: relative;
+    z-index: 2;
+}
+
+/* Grade e não rolagem lateral: a última comanda aparecia cortada na borda
+   e parecia erro. As comandas ficam retas pelo mesmo motivo. */
+.trilho-comandas {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0 0 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 26px 16px;
+}
+.trilho-comandas li { min-width: 0; }
+
+.trilho-comanda {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    background: var(--papel);
+    color: #2A2A26 !important;
+    text-decoration: none !important;
+    font-family: var(--fonte-comanda);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    padding: 18px 14px 12px;
+    box-shadow: 0 6px 14px rgba(11,34,25,0.14);
+    transition: box-shadow 0.2s;
+}
+/* total sempre no pé, mesmo quando a comanda vizinha é mais alta */
+.trilho-comanda .comanda-total { margin-top: auto; }
+
+/* sem grampo: na segunda linha da grade ele ficava pendurado no nada */
+.trilho-comanda::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -9px;
+    height: 9px;
+    background-image: radial-gradient(circle at 6px 9px, transparent 5px, var(--papel) 5.5px);
+    background-size: 12px 9px;
+    background-repeat: repeat-x;
+}
+
+.trilho-comanda .comanda-meta b { color: #1B1B18; }
+.trilho-mesa {
+    display: block;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #1B1B18;
+    line-height: 1.2;
+}
+.trilho-itens {
+    display: block;
+    color: #6E6E64;
+    border-bottom: 1px dashed #B9B4A6;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+.trilho-comanda:hover { box-shadow: 0 10px 22px rgba(11,34,25,0.24); }
+.trilho-comanda:focus-visible { outline: 3px solid var(--mostarda); outline-offset: 4px; }
+
+.trilho-vazio {
+    margin: 14px 0 26px;
+    padding: 24px 22px;
+    border: 1.5px dashed var(--border);
+    background: var(--papel-claro);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.trilho-vazio p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.trilho + .modules-section { padding-top: 26px; }
+/* body do painel é flex em coluna: com margin auto a seção encolhia até o
+   conteúdo e ficava mais estreita que o trilho. width a devolve à grade. */
+.modules-section { width: 100%; }
+
+/* Minha conta: as comandas saem da impressora uma após a outra, como a
+   comanda da vitrine. Usa `translate` (e não transform) para somar ao giro
+   do papel em vez de desentortá-lo durante a animação. O bloco de
+   movimento reduzido da .vitrine já zera a duração. */
+.conta-comanda { animation: conta-imprime 0.4s ease-out backwards; }
+.conta-comanda:nth-child(1) { animation-delay: 0.10s; }
+.conta-comanda:nth-child(2) { animation-delay: 0.22s; }
+.conta-comanda:nth-child(3) { animation-delay: 0.34s; }
+.conta-comanda:nth-child(4) { animation-delay: 0.46s; }
+.conta-comanda:nth-child(5) { animation-delay: 0.58s; }
+.conta-comanda:nth-child(n+6) { animation-delay: 0.70s; }
+
+@keyframes conta-imprime {
+    from { opacity: 0; translate: 0 -12px; }
+    to   { opacity: 1; translate: 0 0; }
+}
+
+/* botão de formulário ocupado (balcao.js) */
+.btn-ficha[aria-busy="true"] { cursor: progress; opacity: 0.85; }
+.btn-ficha[aria-busy="true"] i { margin-right: 2px; }
+
+/* ===== CAIXA: pedidos em aberto, finalizados e total arrecadado =====
+   Dar baixa não apaga nada: o pedido pago só muda de lista. */
+.caixa-resumo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--papel-linha);
+    border: 1px solid var(--papel-linha);
+    margin: 0 0 18px;
+    box-shadow: var(--shadow);
+}
+.caixa-resumo p {
+    flex: 1 1 150px;
+    margin: 0;
+    padding: 14px 20px;
+    background: var(--papel-claro);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.caixa-resumo span {
+    font-family: var(--fonte-comanda);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.caixa-resumo b {
+    font-family: var(--fonte-comanda);
+    font-size: 1.35rem;
+    color: var(--text);
+}
+.caixa-resumo .caixa-total { flex-grow: 2; background: var(--esmalte); }
+.caixa-resumo .caixa-total span { color: var(--gordura); }
+.caixa-resumo .caixa-total b { color: var(--papel); }
+
+.lista-vazia { margin: 0; padding: 22px 24px; color: var(--muted); }
+
+.btn-receber {
+    background: var(--mostarda);
+    color: var(--esmalte-fundo);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+.btn-receber:hover { background: #D19212; color: var(--esmalte-fundo); }
+.btn-receber:focus-visible { outline: 3px solid var(--esmalte); outline-offset: 2px; }
+
+.valor-total .falta {
+    display: block;
+    font-weight: 500;
+    font-size: 0.74rem;
+    color: var(--mostarda-tinta);
+}
+
+/* lista de finalizados recolhida: é histórico, não serviço */
+.historico { margin-bottom: 1.5rem; }
+.historico > summary { cursor: pointer; list-style: none; }
+.historico > summary::-webkit-details-marker { display: none; }
+.historico > summary::after {
+    content: '\f078'; /* fa-chevron-down */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-left: 12px;
+    color: var(--gordura);
+    transition: transform 0.2s;
+}
+.historico[open] > summary::after { transform: rotate(180deg); }
+.historico:not([open]) > summary { border-radius: var(--radius) !important; }
+.historico > summary:focus-visible { outline: 3px solid var(--mostarda); outline-offset: 2px; }
+
+.resumo-itens {
+    font-family: var(--fonte-comanda);
+    font-size: 0.8rem;
+    color: #4A4A42;
+    min-width: 180px;
+    max-width: 320px;
+}
+
+.selo {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 8px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+.selo-pago   { background: rgba(31,122,77,0.14); color: #17563A; }
+.selo-aberto { background: rgba(232,163,23,0.18); color: var(--mostarda-tinta); }
+
+/* pagamento: conferir o pedido antes de cobrar */
+.conferir-pedido {
+    background: var(--papel);
+    font-family: var(--fonte-comanda);
+    padding: 14px 18px;
+    border-left: 3px solid var(--esmalte);
+}
+.conferir-titulo {
+    margin: 0 0 4px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.conferir-itens { margin: 0 0 8px; font-size: 0.9rem; color: var(--text); }
+.conferir-total {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px dashed #B9B4A6;
+    font-size: 0.9rem;
+}
+.conferir-falta { margin: 6px 0 0; font-size: 0.82rem; color: var(--mostarda-tinta); }
+
+/* dica abaixo do campo "Comanda" no pagamento */
+.campo-ajuda { margin: 5px 0 0; font-size: 0.78rem; color: var(--muted); }
+
+/* Minha conta: em aberto na frente, pagos no histórico (fundo verde-escuro) */
+.conta-grupo {
+    font-family: var(--fonte-comanda);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gordura);
+    margin: 0 0 22px;
+}
+.conta-nada { color: var(--texto-corpo); margin: 0 0 8px; }
+
+.conta-historico {
+    margin-top: 48px;
+    border-top: 1px dashed rgba(243,238,226,0.25);
+    padding-top: 18px;
+}
+.conta-historico > summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--fonte-comanda);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gordura);
+}
+.conta-historico > summary::-webkit-details-marker { display: none; }
+.conta-historico > summary::after {
+    content: '\f078';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-left: auto;
+    transition: transform 0.2s;
+}
+.conta-historico[open] > summary::after { transform: rotate(180deg); }
+.conta-historico > summary:hover { color: var(--papel); }
+.conta-historico > summary:focus-visible { outline: 3px solid var(--mostarda); outline-offset: 4px; }
+.conta-historico-conta {
+    background: rgba(243,238,226,0.12);
+    color: var(--papel);
+    border-radius: 20px;
+    padding: 0 9px;
+}
+
+.conta-pagos { list-style: none; margin: 16px 0 0; padding: 0; }
+.conta-pagos li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(243,238,226,0.1);
+    font-family: var(--fonte-comanda);
+}
+.conta-pago-linha {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    margin: 0;
+    color: var(--papel);
+    font-size: 0.86rem;
+}
+.conta-pago-linha span { color: var(--gordura); font-size: 0.78rem; }
+.conta-pago-linha b:last-child { margin-left: auto; }
+.conta-pago-itens { margin: 3px 0 0; color: var(--texto-corpo); font-size: 0.8rem; }

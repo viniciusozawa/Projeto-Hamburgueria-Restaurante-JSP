@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body class="vitrine balcao">
 
@@ -90,7 +90,7 @@
                        autofocus required>
             </div>
 
-            <button class="btn-ficha" type="submit">
+            <button class="btn-ficha" type="submit" data-ocupado="Enviando o link…">
                 <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>Mandar o link
             </button>
 
@@ -103,5 +103,6 @@
 
 </div>
 
+<script src="${pageContext.request.contextPath}/js/balcao.js?v=${VERSAO}"></script>
 </body>
 </html>

@@ -26,6 +26,11 @@ public class Pagamento {
     public LocalDate getDataPagamento() { return dataPagamento; }
     public void setDataPagamento(LocalDate dataPagamento) { this.dataPagamento = dataPagamento; }
 
+    /** Data no formato daqui (24/10/2026), para a tabela. */
+    public String getDataFormatada() {
+        return dataPagamento == null ? "" : dataPagamento.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
     public String getStatusPagamento() { return statusPagamento; }
     public void setStatusPagamento(String statusPagamento) { this.statusPagamento = statusPagamento; }
 

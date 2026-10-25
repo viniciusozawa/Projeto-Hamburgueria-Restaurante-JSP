@@ -1,10 +1,14 @@
-<%-- CabeÁalho da vitrine p˙blica.
+<%-- Cabe√ßalho da vitrine p√∫blica.
 
-     ATEN«√O: isto È um FRAGMENTO. N„o pode ter <!DOCTYPE>, <html>, <head>,
-     <body> nem diretiva <%@page%>, porque ele È colado dentro do index.jsp
-     por <%@include%>. Se voltar a ser um documento completo, ele fecha
-     </body></html> no meio da home e quebra a p·gina inteira.
+     ATEN√á√ÉO: isto √© um FRAGMENTO. N√£o pode ter <!DOCTYPE>, <html>, <head>
+     nem <body>, porque ele √© colado dentro do index.jsp por <%@include%>.
+     Se voltar a ser um documento completo, ele fecha </body></html> no meio
+     da home e quebra a p√°gina inteira.
+
+     A √∫nica diretiva permitida √© a de pageEncoding: cada arquivo inclu√≠do √©
+     lido com a pr√≥pria codifica√ß√£o, e sem ela o servidor assume ISO-8859-1.
 --%>
+<%@page pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
 
 <header class="topo">
@@ -18,11 +22,14 @@
         </button>
 
         <ul class="topo-links" id="topoLinks">
-            <li><a href="${pageContext.request.contextPath}/index.jsp#cardapio">Card·pio</a></li>
+            <li><a href="${pageContext.request.contextPath}/index.jsp#cardapio">Card√°pio</a></li>
             <li><a href="${pageContext.request.contextPath}/index.jsp#casa">A casa</a></li>
             <li><a href="${pageContext.request.contextPath}/index.jsp#onde">Onde achar</a></li>
             <c:choose>
-                <c:when test="${not empty sessionScope.user}">
+                <c:when test="${sessionScope.usuario.cliente}">
+                    <li><a class="topo-entrar" href="${pageContext.request.contextPath}${URL_BASE}/PerfilControlador"><i class="fa-solid fa-user" aria-hidden="true"></i> Minha conta</a></li>
+                </c:when>
+                <c:when test="${not empty sessionScope.usuario}">
                     <li><a class="topo-entrar" href="${pageContext.request.contextPath}/painel.jsp">Abrir o painel</a></li>
                 </c:when>
                 <c:otherwise>
@@ -34,7 +41,7 @@
 </header>
 
 <script>
-    /* Menu do celular: o bot„o controla a lista e mantÈm aria-expanded honesto. */
+    /* Menu do celular: o bot√£o controla a lista e mant√©m aria-expanded honesto. */
     (function () {
         var botao = document.querySelector('.topo-botao');
         var lista = document.getElementById('topoLinks');

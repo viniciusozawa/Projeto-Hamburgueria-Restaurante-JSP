@@ -5,15 +5,15 @@ import java.util.logging.Logger;
 /**
  * Fábrica do enviador e textos das mensagens.
  *
- * A escolha é automática, nesta ordem: Mailgun, Twilio, log. Basta configurar
- * as chaves de um deles (ambiente, -D ou .env — ver Config) para o envio
- * passar a sair de verdade, sem tocar em código.
+ * A escolha é automática: Brevo se a chave estiver configurada (ambiente, -D
+ * ou .env — ver Config), senão log. Ligar o envio de verdade não exige tocar
+ * em código.
  *
  * Isso evita dois problemas: ninguém precisa mexer no código para ligar o
  * envio, e o projeto continua rodando em qualquer máquina sem a chave — o que
  * importa num trabalho que vai ser aberto por outra pessoa.
  *
- * A credencial NUNCA entra no repositório. Ver EnviadorTwilio e CONFIGURAR-EMAIL.md.
+ * A credencial NUNCA entra no repositório. Ver EnviadorBrevo e CONFIGURAR-EMAIL.md.
  */
 public final class Emails {
 
@@ -27,19 +27,17 @@ public final class Emails {
     }
 
     private static EnviadorDeEmail escolher() {
-        // Mailgun primeiro: aceita conteúdo próprio já no sandbox, que é o que
-        // o link de verificação exige. O Twilio em trial não aceita.
-        EnviadorDeEmail mailgun = EnviadorMailgun.daConfig();
-        if (mailgun != null) {
-            LOG.info("Envio de email por " + mailgun.getNome());
-            return mailgun;
+        // Brevo: o plano gratuito entrega para qualquer destinatário sem
+        // domínio próprio, então o professor recebe o link de verdade.
+        EnviadorDeEmail brevo = EnviadorBrevo.daConfig();
+        if (brevo != null) {
+            LOG.info("Envio de email por " + brevo.getNome());
+            return brevo;
         }
 
-        
-
-        LOG.warning("Nenhum provedor configurado (MAILGUN_API_KEY+MAILGUN_DOMINIO "
-                  + "ou TWILIO_ACCOUNT_SID+TWILIO_AUTH_TOKEN): os emails vão para o "
-                  + "log, não para a caixa de entrada. Ver CONFIGURAR-EMAIL.md.");
+        LOG.warning("Nenhum provedor configurado (BREVO_API_KEY+BREVO_REMETENTE): "
+                  + "os emails vão para o log, não para a caixa de entrada. "
+                  + "Ver CONFIGURAR-EMAIL.md.");
         return new EnviadorLog();
     }
 

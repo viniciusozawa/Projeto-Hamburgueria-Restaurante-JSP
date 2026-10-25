@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.TurnosDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Turnos;
 import com.mycompany.restaurantehamburgueria.service.WebConstante;
@@ -51,6 +52,8 @@ public class TurnosController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -64,7 +67,7 @@ public class TurnosController extends HttpServlet {
 
     private void cadastrar(HttpServletRequest req, HttpServletResponse res, String inicio, String fim) throws IOException {
         dao.salvar(montar(inicio, fim));
-        req.getSession().setAttribute("flash", "Turno cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Turno cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/TurnosController?opcao=listar");
     }
 
@@ -81,7 +84,7 @@ public class TurnosController extends HttpServlet {
         Turnos obj = montar(inicio, fim);
         obj.setCodTurnos(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Turno alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Turno alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/TurnosController?opcao=listar");
     }
 
@@ -97,8 +100,14 @@ public class TurnosController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Turnos obj = new Turnos();
         obj.setCodTurnos(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Turno excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Turno excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/TurnosController?opcao=listar");
     }
 

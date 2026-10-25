@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.CargoDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Cargo;
 import com.mycompany.restaurantehamburgueria.service.WebConstante;
@@ -49,6 +50,8 @@ public class CargoController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -57,7 +60,7 @@ public class CargoController extends HttpServlet {
         Cargo obj = new Cargo();
         obj.setNomeCargo(nome);
         dao.salvar(obj);
-        req.getSession().setAttribute("flash", "Cargo cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Cargo cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CargoController?opcao=listar");
     }
 
@@ -74,7 +77,7 @@ public class CargoController extends HttpServlet {
         obj.setCodCargo(Integer.valueOf(cod));
         obj.setNomeCargo(nome);
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Cargo alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Cargo alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CargoController?opcao=listar");
     }
 
@@ -89,8 +92,14 @@ public class CargoController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Cargo obj = new Cargo();
         obj.setCodCargo(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Cargo excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Cargo excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CargoController?opcao=listar");
     }
 

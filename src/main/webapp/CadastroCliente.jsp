@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body>
 
@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label"><i class="fa-solid fa-id-card me-1 text-secondary"></i>CPF</label>
-                        <input type="text" class="form-control" name="cpfCliente" value="${cpfCliente}" placeholder="000.000.000-00"/>
+                        <input type="text" class="form-control" name="cpfCliente" value="${cpfCliente}" placeholder="000.000.000-00" data-mascara="cpf"/>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label"><i class="fa-solid fa-lock me-1 text-secondary"></i>Senha</label>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label"><i class="fa-solid fa-phone me-1 text-secondary"></i>Telefone</label>
-                        <input type="text" class="form-control" name="telefone" value="${telefone}" placeholder="(00) 00000-0000"/>
+                        <input type="tel" class="form-control" name="telefone" value="${telefone}" placeholder="35 99999-9999" data-mascara="celular"/>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label"><i class="fa-solid fa-calendar me-1 text-secondary"></i>Data de Cadastro</label>
@@ -95,8 +95,8 @@
                                 <td>${item.codCliente}</td>
                                 <td>${item.nomeCliente}</td>
                                 <td>${item.email}</td>
-                                <td>${item.cpfCliente}</td>
-                                <td>${item.telefone}</td>
+                                <td data-mascara="cpf">${item.cpfCliente}</td>
+                                <td data-mascara="celular">${item.telefone}</td>
                                 <td>${item.dataCadastro}</td>
                                 <td>
                                     <form method="get" action="${pageContext.request.contextPath}${URL_BASE}/ClienteController" style="display:inline">
@@ -138,5 +138,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/mascaras.js?v=${VERSAO}"></script>
 </body>
 </html>

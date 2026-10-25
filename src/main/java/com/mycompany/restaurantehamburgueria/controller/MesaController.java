@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.MesaDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Mesa;
 import com.mycompany.restaurantehamburgueria.service.WebConstante;
@@ -50,6 +51,8 @@ public class MesaController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -59,7 +62,7 @@ public class MesaController extends HttpServlet {
         obj.setNumeroMesa(Integer.valueOf(num));
         obj.setLocalMesa(local);
         dao.salvar(obj);
-        req.getSession().setAttribute("flash", "Mesa cadastrada com sucesso!");
+        req.getSession().setAttribute("flash", "Mesa cadastrada.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/MesaController?opcao=listar");
     }
 
@@ -78,7 +81,7 @@ public class MesaController extends HttpServlet {
         obj.setNumeroMesa(Integer.valueOf(num));
         obj.setLocalMesa(local);
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Mesa alterada com sucesso!");
+        req.getSession().setAttribute("flash", "Mesa alterada.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/MesaController?opcao=listar");
     }
 
@@ -94,8 +97,14 @@ public class MesaController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Mesa obj = new Mesa();
         obj.setCodMesa(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Mesa excluida com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Mesa excluída.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/MesaController?opcao=listar");
     }
 

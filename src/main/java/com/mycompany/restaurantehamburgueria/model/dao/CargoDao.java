@@ -32,7 +32,7 @@ public class CargoDao extends GenericoDAO<Cargo> {
 
     public void excluir(Cargo obj) {
         String sql = "DELETE FROM cargo WHERE codCargo=?";
-        save(sql, obj.getCodCargo());
+        remover(sql, obj.getCodCargo());
     }
 
     public List<Cargo> buscarTodos() {

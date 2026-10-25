@@ -59,7 +59,7 @@ public class ClienteDao extends GenericoDAO<Cliente> {
 
     public void excluir(Cliente obj) {
         String sql = "DELETE FROM cliente WHERE codCliente=?";
-        save(sql, obj.getCodCliente());
+        remover(sql, obj.getCodCliente());
     }
 
     public List<Cliente> buscarTodos() {
@@ -84,6 +84,17 @@ public class ClienteDao extends GenericoDAO<Cliente> {
         String sql = "UPDATE cliente SET telefone = ?, cpfCliente = ?, cadastroCompleto = 1 "
                    + " WHERE codCliente = ?";
         save(sql, telefone, cpf, codCliente);
+    }
+
+    /**
+     * O que o próprio cliente pode mudar em "Minha conta".
+     *
+     * Email e senha ficam de fora de propósito: trocar o email exigiria
+     * confirmar o novo endereço, e a senha tem o fluxo de "esqueci a senha".
+     */
+    public void atualizarDados(int codCliente, String nome, String telefone, String cpf) {
+        String sql = "UPDATE cliente SET nomeCliente = ?, telefone = ?, cpfCliente = ? WHERE codCliente = ?";
+        save(sql, nome, telefone, cpf, codCliente);
     }
 
     /** O CPF é único na prática: duas contas com o mesmo CPF são a mesma pessoa. */

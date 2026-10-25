@@ -1,30 +1,41 @@
 # Ligar o envio de email
 
-O sistema manda um link de confirmação quando alguém cria conta.
+O sistema manda um link de confirmação quando alguém cria conta, e outro
+quando alguém pede para redefinir a senha.
 
-**Provedor em uso: Mailgun.** Sem chave configurada, o link vai para o
+**Provedor em uso: Brevo.** Sem chave configurada, o link vai para o
 `server.log` em vez da caixa de entrada — o fluxo continua testável.
 
-A escolha é automática, nesta ordem: **Mailgun → Twilio → log**. Basta
-preencher as chaves de um deles; nenhum código muda.
+Por que Brevo: o plano gratuito envia **300 emails por dia para qualquer
+destinatário**, sem exigir domínio próprio. Mailgun (sandbox) e Resend sem
+domínio só entregam para uma lista fechada de endereços.
 
 ---
 
-## 1. O arquivo `.env`
+## 1. Preparar a conta na Brevo
+
+1. Crie a conta em **brevo.com**.
+2. **Settings → Senders, Domains, IPs → Senders → Add a sender**: cadastre o
+   email que vai aparecer como remetente (pode ser um Gmail) e confirme o
+   código de 6 dígitos que chega nele.
+3. **SMTP & API → API Keys**: gere uma chave.
+
+> Remetente `@gmail.com` não pode ser autenticado com SPF/DKIM (o domínio é do
+> Google), então o email tem mais chance de cair no **spam**. Para o trabalho
+> isso não atrapalha: confira a caixa de spam na primeira vez.
+
+## 2. O arquivo `.env`
 
 Copie `.env.example` para `.env` e preencha:
 
 ```
-MAILGUN_API_KEY=suachaveaqui
-MAILGUN_DOMINIO=sandboxXXXXXXXX.mailgun.org
-MAILGUN_REMETENTE=postmaster@sandboxXXXXXXXX.mailgun.org
-MAILGUN_REMETENTE_NOME=Big Tites
+BREVO_API_KEY=suachaveaqui
+BREVO_REMETENTE=o.email.que.voce.confirmou@gmail.com
+BREVO_REMETENTE_NOME=Big Tites
 ```
 
 O `.env` está no `.gitignore` — **chave de API nunca entra no repositório**.
 O `.env.example` é versionado e não tem segredo.
-
-A chave sai de **app.mailgun.com → Sending → Domain settings → API keys**.
 
 ### Onde o `.env` é procurado
 
@@ -46,9 +57,18 @@ cp .env "$GLASSFISH/glassfish/domains/domain1/config/.env"
 
 Variáveis de ambiente e `-D` têm prioridade sobre o arquivo.
 
+O `.env` é lido **uma vez, quando a aplicação sobe**. Depois de trocar a chave
+ou o remetente, reinicie o GlassFish (ou reimplante a aplicação).
+
+### Trocar a conta que envia
+
+Basta outra conta Brevo (ou outro remetente confirmado na mesma conta): troque
+`BREVO_API_KEY` e `BREVO_REMETENTE` no `.env` e reinicie. Para **receber**,
+ninguém precisa configurar nada — é só se cadastrar no site com o próprio email.
+
 ---
 
-## 2. ⚠️ O truststore do GlassFish
+## 3. ⚠️ O truststore do GlassFish
 
 **Este passo já foi feito neste projeto**, mas fica registrado porque o sintoma
 engana muito.
@@ -81,71 +101,28 @@ O código detecta esse erro e explica o que fazer, em vez de dizer só
 
 ---
 
-## 3. Autorizar quem pode receber (sandbox)
-
-O domínio sandbox entrega **apenas para destinatários autorizados — até 5**.
-Qualquer outro endereço volta com `not an authorized recipient`.
-
-Cada autorizado recebe um email da Mailgun e **precisa clicar no link de
-confirmação**. Antes disso fica como *pendente* e continua sem receber nada —
-é o erro mais comum: autorizar e achar que já está valendo.
-
-### Pelo script (mais rápido)
-
-```bash
-./autorizar-email.sh                          # lista quem já está autorizado
-./autorizar-email.sh fulano@gmail.com         # autoriza um
-./autorizar-email.sh a@x.com b@y.com c@z.com  # autoriza vários
-```
-
-Ele lê a chave do `.env`, então nada de segredo no histórico do shell. A saída
-mostra quem está *ativado* e quem está *PENDENTE*, e quantas vagas restam.
-
-### Pelo painel
-
-**app.mailgun.com → Sending → Overview**, aba *Authorized Recipients*, botão
-**Add Recipient**. Mesma coisa, mais cliques.
-
-### Quando 5 não bastar
-
-O limite é do sandbox. Para enviar a qualquer endereço, registre um domínio
-próprio em **Sending → Domains → Add New Domain** e configure os registros DNS
-(SPF, DKIM). Aí a lista de autorizados deixa de existir.
-
-> **Diferença importante:** o sandbox da Mailgun **aceita conteúdo próprio**.
-> O Twilio em modo trial não aceita — só três templates fixos, o que inviabiliza
-> um link de verificação. Foi por isso que este projeto ficou na Mailgun.
-
----
-
 ## 4. Conferir se pegou
 
 Ao subir o domínio, procure no `server.log`:
 
 ```
-INFO: Configuração lida de ...\config\.env (4 chaves)
-INFO: Envio de email por Mailgun (Big Tites <postmaster@sandbox....mailgun.org>)
+INFO: Envio de email por Brevo (Big Tites <seuemail@gmail.com>)
 ```
 
 Envio aceito grava o id da mensagem:
 
 ```
-INFO: Mailgun aceitou o email para fulano@exemplo.com (<2026...@sandbox....>)
+INFO: Brevo aceitou o email para fulano@exemplo.com (<id da mensagem>)
 ```
 
-Se aparecer o aviso abaixo, nenhuma chave chegou:
+Se aparecer o aviso abaixo, a chave ou o remetente não chegaram:
 
 ```
-WARNING: Nenhum provedor configurado (...): os emails vão para o log
+WARNING: Nenhum provedor configurado (BREVO_API_KEY+BREVO_REMETENTE): ...
 ```
 
-Para conferir a entrega de fora, consulte os eventos:
-
-```bash
-curl -s "https://api.mailgun.net/v3/$DOMINIO/events?limit=5" --user "api:$CHAVE"
-```
-
-Procure `"event": "delivered"`.
+No painel da Brevo, **Transactional → Logs** mostra cada email e se foi
+entregue.
 
 ---
 
@@ -153,20 +130,19 @@ Procure `"event": "delivered"`.
 
 | Resposta | O que houve |
 |---|---|
-| **403** `activate your Mailgun account` | Falta clicar no link de ativação que a Mailgun mandou |
-| **400** `not an authorized recipient` | Destinatário fora da lista do sandbox (seção 3) |
-| **401** | Chave errada |
-| `PKIX path building failed` | Truststore do GlassFish (seção 2) |
+| **401** | Chave errada, ou o IP do servidor está bloqueado (ver abaixo) |
+| `unrecognised IP address` | A Brevo bloqueia IPs desconhecidos: libere em **Settings → Security → Authorised IPs** |
+| erro citando `sender` | Remetente não cadastrado ou não confirmado (seção 1, passo 2) |
+| `PKIX path building failed` | Truststore do GlassFish (seção 3) |
 
-Os dois primeiros e o de PKIX o código traduz para português, com o que fazer.
+O código traduz esses casos para português, com o que fazer.
 
 ---
 
-## Por que não usar Unirest
+## Por que não usar o SDK da Brevo
 
-O exemplo da Mailgun sugere Unirest. Não usamos: é de 2017, está sem
-manutenção e puxa httpclient e jackson junto. O `HttpClient` do **Java 11** faz
-o mesmo sem dependência nenhuma no `pom.xml`.
+O SDK oficial puxa okhttp e gson junto. O `HttpClient` do **Java 11** faz o
+mesmo sem dependência nenhuma no `pom.xml`.
 
 ## Trocar de provedor
 

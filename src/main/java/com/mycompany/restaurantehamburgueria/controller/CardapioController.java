@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.CardapioDao;
 import com.mycompany.restaurantehamburgueria.model.dao.CategoriaDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Cardapio;
@@ -55,6 +56,8 @@ public class CardapioController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -73,7 +76,7 @@ public class CardapioController extends HttpServlet {
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
             String nome, String valor, String desc, String codCat) throws IOException {
         dao.salvar(montar(nome, valor, desc, codCat));
-        req.getSession().setAttribute("flash", "Cardapio cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Cardápio cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CardapioController?opcao=listar");
     }
 
@@ -94,7 +97,7 @@ public class CardapioController extends HttpServlet {
         Cardapio obj = montar(nome, valor, desc, codCat);
         obj.setCodCardapio(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Cardapio alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Cardápio alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CardapioController?opcao=listar");
     }
 
@@ -113,8 +116,14 @@ public class CardapioController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Cardapio obj = new Cardapio();
         obj.setCodCardapio(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Cardapio excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Cardápio excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CardapioController?opcao=listar");
     }
 

@@ -39,7 +39,7 @@ public class PedidoPorCardapioDao extends GenericoDAO<PedidoPorCardapio> {
 
     public void excluir(PedidoPorCardapio obj) {
         String sql = "DELETE FROM pedido_por_cardapio WHERE codpedido_por_cardapio=?";
-        save(sql, obj.getCodPedidoPorCardapio());
+        remover(sql, obj.getCodPedidoPorCardapio());
     }
 
     public List<PedidoPorCardapio> buscarPorPedido(int codpedido) {

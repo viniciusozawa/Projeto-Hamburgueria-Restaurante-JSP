@@ -35,7 +35,7 @@ public class FornecedorDao extends GenericoDAO<Fornecedor> {
 
     public void excluir(Fornecedor obj) {
         String sql = "DELETE FROM fornecedores WHERE codFornecedor=?";
-        save(sql, obj.getCodFornecedor());
+        remover(sql, obj.getCodFornecedor());
     }
 
     public List<Fornecedor> buscarTodos() {

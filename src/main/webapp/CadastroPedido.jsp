@@ -1,6 +1,7 @@
-   <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body>
 
@@ -30,6 +31,8 @@
                 <div class="mensagem"><i class="fa-solid fa-circle-check"></i> ${mensagem}</div>
             </c:if>
 
+            <c:choose>
+            <c:when test="${sessionScope.usuario.pode('PedidoController', empty opcao ? 'cadastrar' : opcao)}">
             <form id="formCadastro" method="get" action="${URL_CONTROLLER}">
                 <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}"/>
                 <input type="hidden" name="codpedido" value="${empty codpedido ? 0 : codpedido}"/>
@@ -75,16 +78,33 @@
                     <i class="fa-solid fa-ban"></i> Cancelar
                 </a>
             </div>
+            </c:when>
+            <c:otherwise>
+                <p class="somente-consulta"><i class="fa-solid fa-eye"></i> Seu perfil só consulta esta lista.</p>
+            </c:otherwise>
+            </c:choose>
         </div>
     </div>
 
-    <c:if test="${not empty pedidos}">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <i class="fa-solid fa-list"></i>
-                <h5>Pedidos Cadastrados</h5>
-                <span class="header-hint"><i class="fa-solid fa-circle-info"></i> clique em <b>Itens</b> para abrir a comanda</span>
-            </div>
+    <%-- Caixa do dia a dia: nada é apagado ao dar baixa. O pedido pago só
+         passa de "Em aberto" para "Finalizados". --%>
+    <div class="caixa-resumo" role="group" aria-label="Resumo dos pedidos">
+        <p><span>Em aberto</span><b>${fn:length(pedidosAbertos)}</b></p>
+        <p><span>Finalizados</span><b>${fn:length(pedidosFinalizados)}</b></p>
+        <p class="caixa-total"><span>Total arrecadado</span><b>R$ <fmt:formatNumber value="${totalArrecadado}" pattern="#,##0.00"/></b></p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <i class="fa-solid fa-clock"></i>
+            <h5>Em aberto</h5>
+            <span class="header-hint"><i class="fa-solid fa-circle-info"></i> pago o total, o pedido vai para <b>Finalizados</b></span>
+        </div>
+        <c:choose>
+            <c:when test="${empty pedidosAbertos}">
+                <p class="lista-vazia">Nenhum pedido em aberto. Os pedidos novos aparecem aqui até serem pagos.</p>
+            </c:when>
+            <c:otherwise>
             <div class="table-wrapper">
                 <table class="table tabela-pedidos">
                     <thead>
@@ -100,7 +120,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="item" items="${pedidos}">
+                        <c:forEach var="item" items="${pedidosAbertos}">
                             <tr>
                                 <td><span class="cod-pedido">#${item.codpedido}</span></td>
                                 <td>${item.clientePedido.nomeCliente}</td>
@@ -112,12 +132,21 @@
                                 </td>
                                 <td class="valor-total">
                                     R$ <fmt:formatNumber value="${item.total}" pattern="#,##0.00"/>
+                                    <c:if test="${item.valorRecebido > 0}">
+                                        <small class="falta">falta R$ <fmt:formatNumber value="${item.falta}" pattern="#,##0.00"/></small>
+                                    </c:if>
                                 </td>
                                 <td>
                                     <div class="acoes">
                                         <a href="${URL_CONTROLLER}?opcao=abrirItens&codpedido=${item.codpedido}" class="btn-itens">
                                             <i class="fa-solid fa-burger"></i> Itens
                                         </a>
+                                        <c:if test="${item.qtdItens > 0 and sessionScope.usuario.pode('PagamentoController', 'cadastrar')}">
+                                            <a href="${pageContext.request.contextPath}${URL_BASE}/PagamentoController?opcao=listar&codpedido=${item.codpedido}" class="btn-receber">
+                                                <i class="fa-solid fa-cash-register"></i> Receber
+                                            </a>
+                                        </c:if>
+                                        <c:if test="${sessionScope.usuario.pode('PedidoController', 'enviarAlterar')}">
                                         <form method="get" action="${URL_CONTROLLER}" style="display:inline">
                                             <input type="hidden" name="opcao" value="enviarAlterar"/>
                                             <input type="hidden" name="codpedido" value="${item.codpedido}"/>
@@ -126,6 +155,8 @@
                                             <input type="hidden" name="codFuncionario" value="${item.funcionarioPedido.codFuncionario}"/>
                                             <button type="submit" class="btn-alterar"><i class="fa-solid fa-pencil"></i> Alterar</button>
                                         </form>
+                                        </c:if>
+                                        <c:if test="${sessionScope.usuario.pode('PedidoController', 'enviarExcluir')}">
                                         <form method="get" action="${URL_CONTROLLER}" style="display:inline">
                                             <input type="hidden" name="opcao" value="enviarExcluir"/>
                                             <input type="hidden" name="codpedido" value="${item.codpedido}"/>
@@ -134,6 +165,7 @@
                                             <input type="hidden" name="codFuncionario" value="${item.funcionarioPedido.codFuncionario}"/>
                                             <button type="submit" class="btn-excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
                                         </form>
+                                        </c:if>
                                     </div>
                                 </td>
                             </tr>
@@ -141,7 +173,55 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+
+    <c:if test="${not empty pedidosFinalizados}">
+        <%-- Recolhido: é o histórico, não o serviço de agora. Abre com um clique. --%>
+        <details class="card shadow-sm historico">
+            <summary class="card-header">
+                <i class="fa-solid fa-box-archive"></i>
+                <h5>Finalizados</h5>
+                <span class="header-hint">${fn:length(pedidosFinalizados)} pagos · clique para ver</span>
+            </summary>
+            <div class="table-wrapper">
+                <table class="table tabela-pedidos">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Mesa</th>
+                            <th>Data/Hora</th>
+                            <th>O que comprou</th>
+                            <th>Total</th>
+                            <th>Pago</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="item" items="${pedidosFinalizados}">
+                            <tr>
+                                <td><span class="cod-pedido">#${item.codpedido}</span></td>
+                                <td>${item.clientePedido.nomeCliente}</td>
+                                <td>Mesa ${item.mesaPedido.numeroMesa}</td>
+                                <td>${item.datahoraFormatada}</td>
+                                <td class="resumo-itens"><c:out value="${item.resumoItens}"/></td>
+                                <td>R$ <fmt:formatNumber value="${item.total}" pattern="#,##0.00"/></td>
+                                <td class="valor-total">R$ <fmt:formatNumber value="${item.valorRecebido}" pattern="#,##0.00"/></td>
+                                <td>
+                                    <div class="acoes">
+                                        <a href="${URL_CONTROLLER}?opcao=abrirItens&codpedido=${item.codpedido}" class="btn-itens">
+                                            <i class="fa-solid fa-burger"></i> Itens
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </details>
     </c:if>
 
 </div>

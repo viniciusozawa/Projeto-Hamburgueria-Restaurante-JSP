@@ -4,6 +4,11 @@
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@taglib prefix="fn" uri="jakarta.tags.functions"%>
+<%-- As comandas de hoje, para o trilho do topo. Bean e não controlador
+     porque o painel é aberto por /painel.jsp em vários lugares. --%>
+<jsp:useBean id="servico" class="com.mycompany.restaurantehamburgueria.service.ResumoDoServico" scope="request"/>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body>
 
@@ -31,6 +36,64 @@
         <p class="data" id="dataHoje"></p>
     </div>
 </div>
+
+<%-- ===== TRILHO DE COMANDAS =====
+     A barra onde a cozinha pendura os pedidos. Mostra os de hoje, o mais
+     novo primeiro; cada comanda abre os itens do pedido. --%>
+<c:set var="comandas" value="${servico.comandasDeHoje}"/>
+<section class="trilho" aria-labelledby="tituloTrilho">
+    <div class="trilho-interno">
+        <div class="trilho-cabeca">
+            <h2 class="bloco-nome" id="tituloTrilho">Comandas em aberto</h2>
+            <c:if test="${not empty comandas}">
+                <p class="trilho-resumo">
+                    ${fn:length(comandas)} ${fn:length(comandas) == 1 ? 'comanda' : 'comandas'} de hoje,
+                    R$ <fmt:formatNumber value="${servico.totalDeHoje}" pattern="#,##0.00"/> a receber
+                </p>
+            </c:if>
+        </div>
+
+        <div class="trilho-barra" aria-hidden="true"></div>
+
+        <c:choose>
+            <c:when test="${empty comandas}">
+                <div class="trilho-vazio">
+                    <p>Nenhuma comanda em aberto hoje. Quando o salão lançar um pedido, ele aparece aqui até ser pago.</p>
+                    <c:if test="${sessionScope.usuario.pode('PedidoController', 'cadastrar')}">
+                        <a class="btn-salvar" href="${pageContext.request.contextPath}${URL_BASE}/PedidoController?opcao=listar">
+                            <i class="fa-solid fa-receipt" aria-hidden="true"></i> Abrir uma comanda
+                        </a>
+                    </c:if>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <ul class="trilho-comandas">
+                    <c:forEach var="p" items="${comandas}">
+                        <li>
+                            <a class="trilho-comanda"
+                               href="${pageContext.request.contextPath}${URL_BASE}/PedidoController?opcao=abrirItens&codpedido=${p.codpedido}"
+                               aria-label="Pedido ${p.codpedido}, mesa ${p.mesaPedido.numeroMesa}, ${p.qtdItens} itens. Abrir os itens">
+                                <span class="comanda-meta"><b>#${p.codpedido}</b><span>${p.horaPedido}</span></span>
+                                <span class="trilho-mesa">Mesa ${p.mesaPedido.numeroMesa}</span>
+                                <span class="trilho-itens">
+                                    <c:choose>
+                                        <c:when test="${p.qtdItens == 0}">sem itens ainda</c:when>
+                                        <c:when test="${p.qtdItens == 1}">1 item</c:when>
+                                        <c:otherwise>${p.qtdItens} itens</c:otherwise>
+                                    </c:choose>
+                                </span>
+                                <span class="comanda-total">
+                                    <span>TOTAL</span>
+                                    <span>R$ <fmt:formatNumber value="${p.total}" pattern="#,##0.00"/></span>
+                                </span>
+                            </a>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </c:otherwise>
+        </c:choose>
+    </div>
+</section>
 
 <section class="modules-section">
 

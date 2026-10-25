@@ -30,7 +30,7 @@ public class CategoriaDao extends GenericoDAO<Categoria> {
 
     public void excluir(Categoria obj) {
         String sql = "DELETE FROM categoria WHERE codCategoria=?";
-        save(sql, obj.getCodCategoria());
+        remover(sql, obj.getCodCategoria());
     }
 
     public List<Categoria> buscarTodos() {

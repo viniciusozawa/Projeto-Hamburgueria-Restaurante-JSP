@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.FornecedorDao;
 import com.mycompany.restaurantehamburgueria.model.dao.IngredienteDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Fornecedor;
@@ -59,6 +60,8 @@ public class IngredienteController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -78,7 +81,7 @@ public class IngredienteController extends HttpServlet {
     private void cadastrar(HttpServletRequest req, HttpServletResponse res,
             String nome, String quanti, String producao, String vencimento, String valor, String desc, String codForn) throws IOException {
         dao.salvar(montar(nome, quanti, producao, vencimento, valor, desc, codForn));
-        req.getSession().setAttribute("flash", "Ingrediente cadastrado com sucesso!");
+        req.getSession().setAttribute("flash", "Ingrediente cadastrado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/IngredienteController?opcao=listar");
     }
 
@@ -102,7 +105,7 @@ public class IngredienteController extends HttpServlet {
         Ingrediente obj = montar(nome, quanti, producao, vencimento, valor, desc, codForn);
         obj.setCodIngrediente(Integer.valueOf(cod));
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Ingrediente alterado com sucesso!");
+        req.getSession().setAttribute("flash", "Ingrediente alterado.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/IngredienteController?opcao=listar");
     }
 
@@ -124,8 +127,14 @@ public class IngredienteController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Ingrediente obj = new Ingrediente();
         obj.setCodIngrediente(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Ingrediente excluido com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Ingrediente excluído.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/IngredienteController?opcao=listar");
     }
 

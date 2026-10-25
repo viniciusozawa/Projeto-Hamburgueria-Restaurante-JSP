@@ -1,5 +1,6 @@
 package com.mycompany.restaurantehamburgueria.controller;
 
+import com.mycompany.restaurantehamburgueria.model.dao.ExclusaoRecusada;
 import com.mycompany.restaurantehamburgueria.model.dao.CategoriaDao;
 import com.mycompany.restaurantehamburgueria.model.entity.Categoria;
 import com.mycompany.restaurantehamburgueria.service.WebConstante;
@@ -49,6 +50,8 @@ public class CategoriaController extends HttpServlet {
                     encaminhar(request, response);
             }
         } catch (Exception e) {
+            // sem o tipo, o navegador chuta a codificação e o acento da mensagem quebra
+            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Erro: " + e.getMessage());
         }
     }
@@ -57,7 +60,7 @@ public class CategoriaController extends HttpServlet {
         Categoria obj = new Categoria();
         obj.setNomeCategoria(nome);
         dao.salvar(obj);
-        req.getSession().setAttribute("flash", "Categoria cadastrada com sucesso!");
+        req.getSession().setAttribute("flash", "Categoria cadastrada.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CategoriaController?opcao=listar");
     }
 
@@ -74,7 +77,7 @@ public class CategoriaController extends HttpServlet {
         obj.setCodCategoria(Integer.valueOf(cod));
         obj.setNomeCategoria(nome);
         dao.alterar(obj);
-        req.getSession().setAttribute("flash", "Categoria alterada com sucesso!");
+        req.getSession().setAttribute("flash", "Categoria alterada.");
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CategoriaController?opcao=listar");
     }
 
@@ -89,8 +92,14 @@ public class CategoriaController extends HttpServlet {
     private void confirmarExcluir(HttpServletRequest req, HttpServletResponse res, String cod) throws IOException {
         Categoria obj = new Categoria();
         obj.setCodCategoria(Integer.valueOf(cod));
-        dao.excluir(obj);
-        req.getSession().setAttribute("flash", "Categoria excluida com sucesso!");
+        try {
+            dao.excluir(obj);
+            req.getSession().setAttribute("flash", "Categoria excluída.");
+        } catch (ExclusaoRecusada e) {
+            // o banco recusou (registro em uso): diz onde, em vez de fingir sucesso
+            req.getSession().setAttribute("flash", e.getMessage());
+            req.getSession().setAttribute("flashTipo", "alerta");
+        }
         res.sendRedirect(req.getContextPath() + WebConstante.BASE_PATH + "/CategoriaController?opcao=listar");
     }
 

@@ -20,6 +20,24 @@
         });
     });
 
+    /* --- botão avisa que está trabalhando ---
+       Login e envio de email levam alguns segundos; sem retorno a pessoa
+       clica de novo. O texto vem de data-ocupado ("Entrando…"). */
+    document.querySelectorAll('form').forEach(function (f) {
+        f.addEventListener('submit', function (e) {
+            if (e.defaultPrevented || !f.checkValidity()) return;
+            var botao = f.querySelector('.btn-ficha[type="submit"]');
+            if (!botao) return;
+            var texto = botao.getAttribute('data-ocupado') || 'Um instante…';
+            /* deixa o envio sair antes de desabilitar */
+            setTimeout(function () {
+                botao.disabled = true;
+                botao.setAttribute('aria-busy', 'true');
+                botao.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>' + texto;
+            }, 0);
+        });
+    });
+
     /* --- criação de conta: quantos campos ainda faltam --- */
     var form = document.getElementById('formConta');
     if (!form) return;

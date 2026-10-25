@@ -46,7 +46,7 @@ public class CardapioDao extends GenericoDAO<Cardapio> {
 
     public void excluir(Cardapio obj) {
         String sql = "DELETE FROM cardapio WHERE codCardapio=?";
-        save(sql, obj.getCodCardapio());
+        remover(sql, obj.getCodCardapio());
     }
 
     public List<Cardapio> buscarTodos() {

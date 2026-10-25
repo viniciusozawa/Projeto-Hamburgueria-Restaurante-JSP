@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body>
 
@@ -32,7 +32,7 @@
     </nav>
 
     <c:if test="${not empty mensagem}">
-        <div class="alert alert-success d-flex align-items-center gap-2 border-0 shadow-sm" role="alert">
+        <div class="alert alert-success d-flex align-items-center gap-2 border-0 shadow-sm" role="alert" data-ticket>
             <i class="fa-solid fa-circle-check"></i>
             <div>${mensagem}</div>
         </div>
@@ -94,6 +94,8 @@
                     <h5>Adicionar item</h5>
                 </div>
                 <div class="card-body">
+                    <c:choose>
+                    <c:when test="${sessionScope.usuario.pode('PedidoController', 'adicionarItem')}">
                     <form method="get" action="${URL_CONTROLLER}">
                         <input type="hidden" name="opcao" value="adicionarItem"/>
                         <input type="hidden" name="codpedido" value="${pedidoAtual.codpedido}"/>
@@ -127,6 +129,11 @@
                             <i class="fa-solid fa-plus me-1"></i> Adicionar ao pedido
                         </button>
                     </form>
+                    </c:when>
+                    <c:otherwise>
+                        <p class="somente-consulta"><i class="fa-solid fa-eye"></i> Seu perfil acompanha o pedido, mas não lança itens.</p>
+                    </c:otherwise>
+                    </c:choose>
                 </div>
                 <div class="card-footer-dica">
                     <i class="fa-solid fa-lightbulb"></i>
@@ -198,6 +205,7 @@
                                                 R$ <fmt:formatNumber value="${it.subtotal}" pattern="#,##0.00"/>
                                             </td>
                                             <td class="text-end">
+                                                <c:if test="${sessionScope.usuario.pode('PedidoController', 'removerItem')}">
                                                 <form method="get" action="${URL_CONTROLLER}">
                                                     <input type="hidden" name="opcao" value="removerItem"/>
                                                     <input type="hidden" name="codpedido" value="${pedidoAtual.codpedido}"/>
@@ -206,6 +214,7 @@
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </form>
+                                                </c:if>
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -248,5 +257,6 @@
     <span class="brand">Big Tites</span> &mdash; painel de gerenciamento
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

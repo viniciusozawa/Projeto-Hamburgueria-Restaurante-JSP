@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body>
 
@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label"><i class="fa-solid fa-id-card me-1 text-secondary"></i>CPF</label>
-                        <input type="text" class="form-control" name="cpfFuncionario" value="${cpfFuncionario}" placeholder="000.000.000-00"/>
+                        <input type="text" class="form-control" name="cpfFuncionario" value="${cpfFuncionario}" placeholder="000.000.000-00" data-mascara="cpf"/>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label"><i class="fa-solid fa-lock me-1 text-secondary"></i>Senha</label>
@@ -112,7 +112,7 @@
                                 <td>${item.codFuncionario}</td>
                                 <td>${item.nomeFuncionario}</td>
                                 <td>${item.dataNascimento}</td>
-                                <td>${item.cpfFuncionario}</td>
+                                <td data-mascara="cpf">${item.cpfFuncionario}</td>
                                 <td>R$ ${item.salarioFuncionario}</td>
                                 <td>${item.turnosFuncionario.horarioInicio} — ${item.turnosFuncionario.horarioFinal}</td>
                                 <td>${item.cargoFuncionario.nomeCargo}</td>
@@ -158,5 +158,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/mascaras.js?v=${VERSAO}"></script>
 </body>
 </html>

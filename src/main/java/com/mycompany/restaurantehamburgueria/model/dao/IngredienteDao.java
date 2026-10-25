@@ -59,7 +59,7 @@ public class IngredienteDao extends GenericoDAO<Ingrediente> {
 
     public void excluir(Ingrediente obj) {
         String sql = "DELETE FROM ingrediente WHERE codIngrediente=?";
-        save(sql, obj.getCodIngrediente());
+        remover(sql, obj.getCodIngrediente());
     }
 
     public List<Ingrediente> buscarTodos() {

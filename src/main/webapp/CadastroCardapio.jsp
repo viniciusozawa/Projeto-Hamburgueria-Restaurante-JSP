@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/estilo.css?v=${VERSAO}">
 </head>
 <body>
 
@@ -27,6 +27,8 @@
                 <div class="mensagem"><i class="fa-solid fa-circle-check"></i> ${mensagem}</div>
             </c:if>
 
+            <c:choose>
+            <c:when test="${sessionScope.usuario.pode('CardapioController', empty opcao ? 'cadastrar' : opcao)}">
             <form id="formCadastro" method="get"
                 action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/CardapioController">
                 <input type="hidden" name="opcao" value="${empty opcao ? 'cadastrar' : opcao}"/>
@@ -65,6 +67,11 @@
                     <i class="fa-solid fa-ban"></i> Cancelar
                 </a>
             </div>
+            </c:when>
+            <c:otherwise>
+                <p class="somente-consulta"><i class="fa-solid fa-eye"></i> Seu perfil só consulta esta lista.</p>
+            </c:otherwise>
+            </c:choose>
         </div>
     </div>
 
@@ -95,6 +102,7 @@
                                 <td>${item.descricaoComida}</td>
                                 <td><span style="background:#f39c12;color:#1e1e2e;padding:2px 10px;border-radius:20px;font-size:0.78rem;font-weight:600">${item.categoriaCardapio.nomeCategoria}</span></td>
                                 <td>
+                                    <c:if test="${sessionScope.usuario.pode('CardapioController', 'enviarAlterar')}">
                                     <form method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/CardapioController" style="display:inline">
                                         <input type="hidden" name="opcao" value="enviarAlterar"/>
                                         <input type="hidden" name="codCardapio" value="${item.codCardapio}"/>
@@ -104,6 +112,8 @@
                                         <input type="hidden" name="codCategoria" value="${item.categoriaCardapio.codCategoria}"/>
                                         <button type="submit" class="btn-alterar"><i class="fa-solid fa-pencil"></i> Alterar</button>
                                     </form>
+                                    </c:if>
+                                    <c:if test="${sessionScope.usuario.pode('CardapioController', 'enviarExcluir')}">
                                     <form method="get" action="${pageContext.request.contextPath}/com/mycompany/restaurantehamburgueria/controller/CardapioController" style="display:inline">
                                         <input type="hidden" name="opcao" value="enviarExcluir"/>
                                         <input type="hidden" name="codCardapio" value="${item.codCardapio}"/>
@@ -113,6 +123,7 @@
                                         <input type="hidden" name="codCategoria" value="${item.categoriaCardapio.codCategoria}"/>
                                         <button type="submit" class="btn-excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
                                     </form>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>

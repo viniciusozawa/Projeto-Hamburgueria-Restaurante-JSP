@@ -55,11 +55,12 @@ public class PagamentoDao extends GenericoDAO<Pagamento> {
 
     public void excluir(Pagamento obj) {
         String sql = "DELETE FROM pagamento WHERE codPagamento=?";
-        save(sql, obj.getCodPagamento());
+        remover(sql, obj.getCodPagamento());
     }
 
     public List<Pagamento> buscarTodos() {
-        return buscarTodos("SELECT * FROM pagamento", new PagamentoRowMapper());
+        return buscarTodos("SELECT * FROM pagamento ORDER BY dataPagamento DESC, codPagamento DESC",
+                new PagamentoRowMapper());
     }
 
     public Pagamento buscarPorId(int id) {

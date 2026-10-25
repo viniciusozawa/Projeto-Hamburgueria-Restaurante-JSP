@@ -31,7 +31,7 @@ public class MesaDao extends GenericoDAO<Mesa> {
 
     public void excluir(Mesa obj) {
         String sql = "DELETE FROM mesa WHERE codMesa=?";
-        save(sql, obj.getCodMesa());
+        remover(sql, obj.getCodMesa());
     }
 
     public List<Mesa> buscarTodos() {
