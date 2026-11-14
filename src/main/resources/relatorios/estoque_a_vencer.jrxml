@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Relatório 5 - Estoque a vencer (JasperReports, formato da versão 6).
+
+  Para que serve: a situação de HOJE de cada ingrediente, do mais urgente ao
+  mais tranquilo, com quanto dinheiro está parado no estoque.
+  Decisões: o que jogar fora (vencido), o que usar primeiro (vence logo) e
+  o que comprar (estoque baixo). O total vencido mostra o prejuízo.
+
+  Cada ingrediente recebe UMA situação, na ordem de gravidade:
+    1 Vencido       - a validade já passou;
+    2 Vence logo    - vence em até DIAS_ALERTA dias;
+    3 Estoque baixo - quantidade até ESTOQUE_MINIMO;
+    4 OK.
+  Não usa período: é uma foto do estoque agora.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="estoque_a_vencer" pageWidth="595" pageHeight="842" columnWidth="535"
+              leftMargin="30" rightMargin="30" topMargin="28" bottomMargin="28"
+              whenNoDataType="AllSectionsNoDetail">
+
+    <style name="Base" isDefault="true" fontName="DejaVu Sans" fontSize="9" forecolor="#1E2A24"/>
+    <style name="Cabecalho" fontName="DejaVu Sans" fontSize="9" isBold="true" forecolor="#123B2E" backcolor="#F3EEE2" mode="Opaque"/>
+    <style name="Linha">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></conditionExpression>
+            <style mode="Opaque" backcolor="#FBF9F4"/>
+        </conditionalStyle>
+    </style>
+    <!-- etiqueta colorida da situação -->
+    <style name="Situacao" mode="Opaque" isBold="true" forecolor="#FFFFFF" backcolor="#1C5340">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{prioridade} == 1]]></conditionExpression>
+            <style backcolor="#C4341F"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{prioridade} == 2]]></conditionExpression>
+            <style backcolor="#E8A317" forecolor="#1E2A24"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{prioridade} == 3]]></conditionExpression>
+            <style backcolor="#8A5E05"/>
+        </conditionalStyle>
+    </style>
+    <style name="Total" mode="Opaque" forecolor="#FFFFFF" backcolor="#123B2E" isBold="true"/>
+
+    <parameter name="DIAS_ALERTA" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[15]]></defaultValueExpression>
+    </parameter>
+    <parameter name="ESTOQUE_MINIMO" class="java.math.BigDecimal">
+        <defaultValueExpression><![CDATA[new java.math.BigDecimal("20")]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT s.*,
+       CASE s.prioridade WHEN 1 THEN 'Vencido' WHEN 2 THEN 'Vence logo'
+                         WHEN 3 THEN 'Estoque baixo' ELSE 'OK' END AS situacao
+  FROM (SELECT i.nomeIngredientes                               AS ingrediente,
+               f.nomeFornecedor                                 AS fornecedor,
+               i.quantiIngredientes                             AS quantidade,
+               i.quantiIngredientes * i.valorIngrediente        AS valor_estoque,
+               i.dataVencimento                                 AS vencimento,
+               CAST(DATEDIFF(i.dataVencimento, CURDATE()) AS SIGNED) AS dias,
+               CAST(CASE WHEN i.dataVencimento < CURDATE() THEN 1
+                         WHEN DATEDIFF(i.dataVencimento, CURDATE()) <= $P{DIAS_ALERTA} THEN 2
+                         WHEN i.quantiIngredientes <= $P{ESTOQUE_MINIMO} THEN 3
+                         ELSE 4 END AS SIGNED)                  AS prioridade
+          FROM ingrediente i
+          JOIN fornecedores f ON f.codFornecedor = i.fornecedores_codFornecedor) s
+ ORDER BY s.prioridade, s.vencimento, s.ingrediente
+        ]]>
+    </queryString>
+
+    <field name="ingrediente" class="java.lang.String"/>
+    <field name="fornecedor" class="java.lang.String"/>
+    <field name="quantidade" class="java.math.BigDecimal"/>
+    <field name="valor_estoque" class="java.math.BigDecimal"/>
+    <field name="vencimento" class="java.sql.Date"/>
+    <field name="dias" class="java.lang.Long"/>
+    <field name="prioridade" class="java.lang.Long"/>
+    <field name="situacao" class="java.lang.String"/>
+
+    <variable name="VALOR_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{valor_estoque}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="VALOR_VENCIDO" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{prioridade} == 1 ? $F{valor_estoque} : java.math.BigDecimal.ZERO]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="QTD_VENCIDO" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{prioridade} == 1 ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="QTD_LOGO" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{prioridade} == 2 ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="QTD_BAIXO" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{prioridade} == 3 ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    <variable name="QTD_OK" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{prioridade} == 4 ? 1 : 0]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+
+    <title>
+        <band height="86">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="535" height="62" forecolor="#123B2E" backcolor="#123B2E"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="14" y="8" width="300" height="16" forecolor="#E8A317"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[BIG TITES · HAMBURGUERIA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="14" y="26" width="360" height="26" forecolor="#FFFFFF"/>
+                <textElement><font size="18" isBold="true"/></textElement>
+                <text><![CDATA[Estoque a vencer]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="330" y="10" width="192" height="14" forecolor="#C7D8CE"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["Situação em " + new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="330" y="36" width="192" height="14" forecolor="#C7D8CE"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Gerado em " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="68" width="535" height="14" forecolor="#5C6B63"/>
+                <textElement><font size="8" isItalic="true"/></textElement>
+                <textFieldExpression><![CDATA["Vence logo = em até " + $P{DIAS_ALERTA} + " dias. Estoque baixo = até "
+    + $P{ESTOQUE_MINIMO}.stripTrailingZeros().toPlainString() + " unidades. Valor em estoque = quantidade × preço de compra."]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="22">
+            <staticText>
+                <reportElement style="Cabecalho" x="0" y="0" width="80" height="22"/>
+                <box leftPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Situação]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="80" y="0" width="115" height="22"/>
+                <box leftPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Ingrediente]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="195" y="0" width="90" height="22"/>
+                <box leftPadding="4"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Fornecedor]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="285" y="0" width="45" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Qtd.]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="330" y="0" width="70" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Validade]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="400" y="0" width="60" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Prazo]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="460" y="0" width="75" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Valor parado]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement style="Situacao" x="2" y="3" width="74" height="14"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement>
+                <textFieldExpression><![CDATA[$F{situacao}.toUpperCase()]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="Linha" x="80" y="0" width="115" height="20"/>
+                <box leftPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{ingrediente}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="Linha" x="195" y="0" width="90" height="20"/>
+                <box leftPadding="4"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{fornecedor}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.##">
+                <reportElement style="Linha" x="285" y="0" width="45" height="20"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{quantidade}]]></textFieldExpression>
+            </textField>
+            <textField pattern="dd/MM/yyyy">
+                <reportElement style="Linha" x="330" y="0" width="70" height="20"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{vencimento}]]></textFieldExpression>
+            </textField>
+            <!-- negativo = já venceu: "há 30 d" -->
+            <textField>
+                <reportElement style="Linha" x="400" y="0" width="60" height="20"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$F{dias} < 0 ? "há " + (-$F{dias}) + " d" : ($F{dias} == 0 ? "hoje" : $F{dias} + " d")]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Linha" x="460" y="0" width="75" height="20"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{valor_estoque}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="4" width="300" height="14" forecolor="#93AA9C"/>
+                <textElement><font size="7"/></textElement>
+                <text><![CDATA[Big Tites · relatório gerado pelo sistema]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="395" y="4" width="100" height="14" forecolor="#93AA9C"/>
+                <textElement textAlignment="Right"><font size="7"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="495" y="4" width="40" height="14" forecolor="#93AA9C"/>
+                <textElement><font size="7"/></textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="100">
+            <staticText>
+                <reportElement style="Total" x="0" y="0" width="460" height="22"/>
+                <box leftPadding="6"/>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Valor total em estoque]]></text>
+            </staticText>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Total" x="460" y="0" width="75" height="22" forecolor="#E8A317"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{VALOR_TOTAL}]]></textFieldExpression>
+            </textField>
+
+            <!-- quatro indicadores lado a lado, um por situação -->
+            <textField>
+                <reportElement mode="Opaque" x="0" y="32" width="128" height="40" forecolor="#FFFFFF" backcolor="#C4341F"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{QTD_VENCIDO} + " vencido" + ($V{QTD_VENCIDO} == 1 ? "" : "s")]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement mode="Opaque" x="135" y="32" width="128" height="40" forecolor="#1E2A24" backcolor="#E8A317"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{QTD_LOGO} + " vence" + ($V{QTD_LOGO} == 1 ? "" : "m") + " logo"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement mode="Opaque" x="270" y="32" width="128" height="40" forecolor="#FFFFFF" backcolor="#8A5E05"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{QTD_BAIXO} + " com estoque baixo"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement mode="Opaque" x="405" y="32" width="130" height="40" forecolor="#FFFFFF" backcolor="#1C5340"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{QTD_OK} + " OK"]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="80" width="535" height="16" forecolor="#C4341F">
+                    <printWhenExpression><![CDATA[$V{VALOR_VENCIDO}.signum() > 0]]></printWhenExpression>
+                </reportElement>
+                <textElement><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["Prejuízo com vencidos: R$ "
+    + new java.text.DecimalFormat("#,##0.00", java.text.DecimalFormatSymbols.getInstance($P{REPORT_LOCALE})).format($V{VALOR_VENCIDO})
+    + ". Descarte esses itens e compre menos deles da próxima vez."]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Relatório 3 - Vendas por categoria (JasperReports, formato da versão 6).
+
+  Para que serve: quanto cada categoria do cardápio (hambúrguer, bebida,
+  sobremesa...) vendeu no período e quanto pesa no faturamento.
+  "Receita por prato" divide a receita pelo número de pratos da categoria:
+  mostra se uma categoria rende bem ou só tem muitos pratos.
+  Decisões: em que parte do cardápio investir em pratos novos, e qual
+  categoria tem pratos demais para o que vende.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="vendas_por_categoria" pageWidth="595" pageHeight="842" columnWidth="535"
+              leftMargin="30" rightMargin="30" topMargin="28" bottomMargin="28"
+              whenNoDataType="AllSectionsNoDetail">
+
+    <style name="Base" isDefault="true" fontName="DejaVu Sans" fontSize="9" forecolor="#1E2A24"/>
+    <style name="Cabecalho" fontName="DejaVu Sans" fontSize="9" isBold="true" forecolor="#123B2E" backcolor="#F3EEE2" mode="Opaque"/>
+    <style name="Linha">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></conditionExpression>
+            <style mode="Opaque" backcolor="#FBF9F4"/>
+        </conditionalStyle>
+    </style>
+    <style name="Total" mode="Opaque" forecolor="#FFFFFF" backcolor="#123B2E" isBold="true"/>
+
+    <parameter name="DATA_INICIO" class="java.sql.Date"/>
+    <parameter name="DATA_FIM" class="java.sql.Date"/>
+    <parameter name="PERIODO" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Todo o período"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT cat.nomeCategoria                AS categoria,
+       COUNT(DISTINCT c.codCardapio)    AS pratos,
+       COALESCE(SUM(v.qtd), 0)          AS quantidade,
+       COALESCE(SUM(v.receita), 0)      AS receita,
+       COALESCE(SUM(v.receita), 0) / NULLIF(SUM(COALESCE(SUM(v.receita), 0)) OVER (), 0) AS participacao
+  FROM categoria cat
+  LEFT JOIN cardapio c ON c.categoria_codCategoria = cat.codCategoria
+  LEFT JOIN (SELECT pc.cardapio_codCardapio              AS cod,
+                    SUM(pc.quantidade)                   AS qtd,
+                    SUM(pc.quantidade * c2.valorComida)  AS receita
+               FROM pedido_por_cardapio pc
+               JOIN pedido p    ON p.codpedido = pc.pedido_idpedido
+               JOIN cardapio c2 ON c2.codCardapio = pc.cardapio_codCardapio
+              WHERE ($P{DATA_INICIO} IS NULL OR DATE(p.datahoraPedido) >= $P{DATA_INICIO})
+                AND ($P{DATA_FIM}    IS NULL OR DATE(p.datahoraPedido) <= $P{DATA_FIM})
+              GROUP BY pc.cardapio_codCardapio) v ON v.cod = c.codCardapio
+ GROUP BY cat.codCategoria, cat.nomeCategoria
+ ORDER BY receita DESC, categoria
+        ]]>
+    </queryString>
+
+    <field name="categoria" class="java.lang.String"/>
+    <field name="pratos" class="java.lang.Long"/>
+    <field name="quantidade" class="java.math.BigDecimal"/>
+    <field name="receita" class="java.math.BigDecimal"/>
+    <field name="participacao" class="java.math.BigDecimal"/>
+
+    <variable name="TOTAL_PRATOS" class="java.lang.Long" calculation="Sum">
+        <variableExpression><![CDATA[$F{pratos}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_QTD" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{quantidade}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_RECEITA" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{receita}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="LIDER" class="java.lang.String" calculation="First">
+        <variableExpression><![CDATA[$F{categoria}]]></variableExpression>
+    </variable>
+    <variable name="LIDER_PART" class="java.math.BigDecimal" calculation="First">
+        <variableExpression><![CDATA[$F{participacao}]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="86">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="535" height="62" forecolor="#123B2E" backcolor="#123B2E"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="14" y="8" width="300" height="16" forecolor="#E8A317"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[BIG TITES · HAMBURGUERIA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="14" y="26" width="360" height="26" forecolor="#FFFFFF"/>
+                <textElement><font size="18" isBold="true"/></textElement>
+                <text><![CDATA[Vendas por categoria]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="330" y="10" width="192" height="14" forecolor="#C7D8CE"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$P{PERIODO}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="330" y="36" width="192" height="14" forecolor="#C7D8CE"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Gerado em " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="68" width="535" height="14" forecolor="#5C6B63"/>
+                <textElement><font size="8" isItalic="true"/></textElement>
+                <text><![CDATA[Receita por prato = receita da categoria ÷ pratos que ela tem no cardápio.]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="22">
+            <staticText>
+                <reportElement style="Cabecalho" x="0" y="0" width="140" height="22"/>
+                <box leftPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Categoria]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="140" y="0" width="75" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Pratos]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="215" y="0" width="75" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Vendidos]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="290" y="0" width="90" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Receita]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="380" y="0" width="65" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[% receita]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="445" y="0" width="90" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[R$ por prato]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <textField>
+                <reportElement style="Linha" x="0" y="0" width="140" height="18"/>
+                <box leftPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0">
+                <reportElement style="Linha" x="140" y="0" width="75" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{pratos}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0">
+                <reportElement style="Linha" x="215" y="0" width="75" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{quantidade}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Linha" x="290" y="0" width="90" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{receita}]]></textFieldExpression>
+            </textField>
+            <textField pattern="0.0%" isBlankWhenNull="true">
+                <reportElement style="Linha" x="380" y="0" width="65" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{participacao}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Linha" x="445" y="0" width="90" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{pratos} == 0 ? java.math.BigDecimal.ZERO
+    : $F{receita}.divide(new java.math.BigDecimal($F{pratos}), 2, java.math.RoundingMode.HALF_UP)]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="4" width="300" height="14" forecolor="#93AA9C"/>
+                <textElement><font size="7"/></textElement>
+                <text><![CDATA[Big Tites · relatório gerado pelo sistema]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="395" y="4" width="100" height="14" forecolor="#93AA9C"/>
+                <textElement textAlignment="Right"><font size="7"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="495" y="4" width="40" height="14" forecolor="#93AA9C"/>
+                <textElement><font size="7"/></textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="340">
+            <staticText>
+                <reportElement style="Total" x="0" y="0" width="140" height="22"/>
+                <box leftPadding="6"/>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Total]]></text>
+            </staticText>
+            <textField pattern="#,##0">
+                <reportElement style="Total" x="140" y="0" width="75" height="22"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{TOTAL_PRATOS}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0">
+                <reportElement style="Total" x="215" y="0" width="75" height="22"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{TOTAL_QTD}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Total" x="290" y="0" width="90" height="22" forecolor="#E8A317"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{TOTAL_RECEITA}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="Total" x="380" y="0" width="65" height="22"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{TOTAL_RECEITA}.signum() > 0 ? "100%" : "–"]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Total" x="445" y="0" width="90" height="22"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$V{TOTAL_PRATOS} == 0 ? java.math.BigDecimal.ZERO
+    : $V{TOTAL_RECEITA}.divide(new java.math.BigDecimal($V{TOTAL_PRATOS}), 2, java.math.RoundingMode.HALF_UP)]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="30" width="535" height="16" forecolor="#123B2E">
+                    <printWhenExpression><![CDATA[$V{TOTAL_RECEITA}.signum() > 0]]></printWhenExpression>
+                </reportElement>
+                <textElement><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{LIDER} + " responde por "
+    + new java.text.DecimalFormat("0.0%", java.text.DecimalFormatSymbols.getInstance($P{REPORT_LOCALE})).format($V{LIDER_PART})
+    + " da receita do período."]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="30" width="535" height="16" forecolor="#C4341F">
+                    <printWhenExpression><![CDATA[$V{TOTAL_RECEITA}.signum() == 0]]></printWhenExpression>
+                </reportElement>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Nenhuma venda no período escolhido.]]></text>
+            </staticText>
+
+            <!-- Pizza: cada fatia é a receita de uma categoria -->
+            <pieChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="0" y="56" width="535" height="280">
+                        <printWhenExpression><![CDATA[$V{TOTAL_RECEITA}.signum() > 0]]></printWhenExpression>
+                    </reportElement>
+                    <chartTitle color="#123B2E">
+                        <font size="11" isBold="true"/>
+                        <titleExpression><![CDATA["Participação na receita"]]></titleExpression>
+                    </chartTitle>
+                    <chartSubtitle/>
+                    <chartLegend position="Right">
+                        <font size="8"/>
+                    </chartLegend>
+                </chart>
+                <pieDataset>
+                    <keyExpression><![CDATA[$F{categoria}]]></keyExpression>
+                    <valueExpression><![CDATA[$F{receita}]]></valueExpression>
+                </pieDataset>
+                <!-- {0} = nome, {1} = valor, {2} = porcentagem -->
+                <piePlot isShowLabels="true" isCircular="true" labelFormat="{2}" legendLabelFormat="{0}">
+                    <plot backcolor="#FFFFFF">
+                        <seriesColor seriesOrder="0" color="#123B2E"/>
+                        <seriesColor seriesOrder="1" color="#E8A317"/>
+                        <seriesColor seriesOrder="2" color="#C4341F"/>
+                        <seriesColor seriesOrder="3" color="#93AA9C"/>
+                        <seriesColor seriesOrder="4" color="#8A5E05"/>
+                        <seriesColor seriesOrder="5" color="#1C5340"/>
+                    </plot>
+                    <itemLabel>
+                        <font size="8"/>
+                    </itemLabel>
+                </piePlot>
+            </pieChart>
+        </band>
+    </summary>
+</jasperReport>

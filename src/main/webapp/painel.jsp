@@ -222,6 +222,23 @@
     </div>
     </c:if>
 
+    <c:if test="${sessionScope.usuario.pode('RelatorioController', 'listar')}">
+    <div class="bloco">
+        <h2 class="bloco-nome">Gestão</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+            <div class="col">
+                <a class="module-card" href="${pageContext.request.contextPath}${URL_BASE}/RelatorioController">
+                    <i class="fa-solid fa-chart-line mod-icon" aria-hidden="true"></i>
+                    <span class="mod-texto">
+                        <span class="mod-name">Relatórios</span>
+                        <span class="mod-desc">Vendas, estoque e equipe em PDF e Excel</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+    </c:if>
+
 </section>
 
 <footer>

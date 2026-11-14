@@ -37,6 +37,28 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
+
+        <!-- ===== RELATÓRIOS ===== -->
+        <!-- JasperReports (abordagem 1): lê o .jrxml, roda o SQL e exporta PDF/Excel.
+             Fica na 6.21: a 7.x exige Java 17 e o projeto é Java 11. -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.21.5</version>
+        </dependency>
+        <!-- Fonte DejaVu embutida no PDF: o relatório sai igual em qualquer
+             máquina, com acento, sem depender das fontes do Windows. -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.21.5</version>
+        </dependency>
+        <!-- Apache POI (abordagem 3): monta planilhas .xlsx célula por célula. -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>

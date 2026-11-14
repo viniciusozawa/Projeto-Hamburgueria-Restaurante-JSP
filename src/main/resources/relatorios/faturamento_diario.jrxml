@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Relatório 1 - Faturamento por dia (JasperReports, formato da versão 6).
+
+  Para que serve: ver quanto foi vendido e recebido em cada dia, quantos pedidos
+  houve e o valor médio por pedido (ticket médio).
+  Decisões: em que dias reforçar a equipe e o estoque, e quanto ainda falta receber.
+
+  Regras iguais às do painel:
+  - total do pedido = soma de quantidade x preço do cardápio;
+  - recebido = soma dos pagamentos daquele pedido (tabela pagamento).
+  O dia é o dia em que o pedido foi aberto.
+
+  Parâmetros (o RelatorioController preenche):
+  - DATA_INICIO / DATA_FIM: período; nulo = sem limite daquele lado;
+  - PERIODO: o período escrito por extenso, para o cabeçalho.
+
+  Faixas (bands), de cima para baixo: title, columnHeader, detail (uma linha
+  por dia), pageFooter e summary (totais + gráfico, no fim).
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="faturamento_diario" pageWidth="595" pageHeight="842" columnWidth="535"
+              leftMargin="30" rightMargin="30" topMargin="28" bottomMargin="28"
+              whenNoDataType="AllSectionsNoDetail">
+
+    <!-- Paleta "Esmalte" do site: verde #123B2E, mostarda #E8A317, papel #F3EEE2 -->
+    <style name="Base" isDefault="true" fontName="DejaVu Sans" fontSize="9" forecolor="#1E2A24"/>
+    <style name="Cabecalho" fontName="DejaVu Sans" fontSize="9" isBold="true" forecolor="#123B2E" backcolor="#F3EEE2" mode="Opaque"/>
+    <style name="Linha">
+        <!-- linhas pares com fundo papel-claro, para o olho não se perder -->
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></conditionExpression>
+            <style mode="Opaque" backcolor="#FBF9F4"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="DATA_INICIO" class="java.sql.Date"/>
+    <parameter name="DATA_FIM" class="java.sql.Date"/>
+    <parameter name="PERIODO" class="java.lang.String">
+        <defaultValueExpression><![CDATA["Todo o período"]]></defaultValueExpression>
+    </parameter>
+
+    <!-- A consulta interna calcula total e recebido POR PEDIDO; a externa soma
+         por dia. Somar direto com os JOINs contaria o pagamento uma vez por item. -->
+    <queryString language="SQL">
+        <![CDATA[
+SELECT DATE(t.datahoraPedido) AS dia,
+       COUNT(*)               AS pedidos,
+       SUM(t.itens)           AS itens,
+       SUM(t.total)           AS vendido,
+       SUM(t.recebido)        AS recebido,
+       -- o que falta, pedido a pedido: pagamento a mais num pedido
+       -- (ex.: lançado duas vezes) não abate a dívida de outro
+       SUM(GREATEST(t.total - t.recebido, 0)) AS falta
+  FROM (SELECT p.codpedido,
+               p.datahoraPedido,
+               COALESCE(SUM(pc.quantidade), 0)                 AS itens,
+               COALESCE(SUM(pc.quantidade * c.valorComida), 0) AS total,
+               (SELECT COALESCE(SUM(pg.valorPago), 0)
+                  FROM pagamento pg
+                 WHERE pg.pedido_codpedido = p.codpedido)      AS recebido
+          FROM pedido p
+          LEFT JOIN pedido_por_cardapio pc ON pc.pedido_idpedido = p.codpedido
+          LEFT JOIN cardapio c             ON c.codCardapio = pc.cardapio_codCardapio
+         WHERE ($P{DATA_INICIO} IS NULL OR DATE(p.datahoraPedido) >= $P{DATA_INICIO})
+           AND ($P{DATA_FIM}    IS NULL OR DATE(p.datahoraPedido) <= $P{DATA_FIM})
+         GROUP BY p.codpedido, p.datahoraPedido) t
+ GROUP BY DATE(t.datahoraPedido)
+ ORDER BY dia
+        ]]>
+    </queryString>
+
+    <field name="dia" class="java.sql.Date"/>
+    <field name="pedidos" class="java.lang.Long"/>
+    <field name="itens" class="java.math.BigDecimal"/>
+    <field name="vendido" class="java.math.BigDecimal"/>
+    <field name="recebido" class="java.math.BigDecimal"/>
+    <field name="falta" class="java.math.BigDecimal"/>
+
+    <!-- Totais do período (somam as linhas) -->
+    <variable name="TOTAL_PEDIDOS" class="java.lang.Long" calculation="Sum">
+        <variableExpression><![CDATA[$F{pedidos}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_ITENS" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{itens}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_VENDIDO" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{vendido}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_RECEBIDO" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{recebido}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_FALTA" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{falta}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
+    <!-- ================= TÍTULO (só na primeira página) ================= -->
+    <title>
+        <band height="86">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="535" height="62" forecolor="#123B2E" backcolor="#123B2E"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="14" y="8" width="300" height="16" forecolor="#E8A317"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[BIG TITES · HAMBURGUERIA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="14" y="26" width="360" height="26" forecolor="#FFFFFF"/>
+                <textElement><font size="18" isBold="true"/></textElement>
+                <text><![CDATA[Faturamento por dia]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="330" y="10" width="192" height="14" forecolor="#C7D8CE"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$P{PERIODO}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="330" y="36" width="192" height="14" forecolor="#C7D8CE"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Gerado em " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="68" width="535" height="14" forecolor="#5C6B63"/>
+                <textElement><font size="8" isItalic="true"/></textElement>
+                <text><![CDATA[Vendido = itens dos pedidos abertos no dia, pelo preço do cardápio. Recebido = pagamentos lançados nesses pedidos.]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- ================= CABEÇALHO DAS COLUNAS (toda página) ================= -->
+    <columnHeader>
+        <band height="22">
+            <staticText>
+                <reportElement style="Cabecalho" x="0" y="0" width="95" height="22"/>
+                <box leftPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Dia]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="95" y="0" width="70" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Pedidos]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="165" y="0" width="70" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Itens]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="235" y="0" width="100" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Vendido]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="335" y="0" width="100" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Recebido]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Cabecalho" x="435" y="0" width="100" height="22"/>
+                <box rightPadding="6"><bottomPen lineWidth="1.5" lineColor="#123B2E"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <text><![CDATA[Ticket médio]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- ================= DETALHE (uma linha por dia) ================= -->
+    <detail>
+        <band height="18">
+            <textField pattern="dd/MM/yyyy (EEE)">
+                <reportElement style="Linha" x="0" y="0" width="95" height="18"/>
+                <box leftPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{dia}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0">
+                <reportElement style="Linha" x="95" y="0" width="70" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{pedidos}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0">
+                <reportElement style="Linha" x="165" y="0" width="70" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{itens}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Linha" x="235" y="0" width="100" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{vendido}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Linha" x="335" y="0" width="100" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{recebido}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement style="Linha" x="435" y="0" width="100" height="18"/>
+                <box rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#ECE7DB"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{pedidos} == 0 ? java.math.BigDecimal.ZERO
+    : $F{vendido}.divide(new java.math.BigDecimal($F{pedidos}), 2, java.math.RoundingMode.HALF_UP)]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- ================= RODAPÉ (toda página) ================= -->
+    <pageFooter>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="4" width="300" height="14" forecolor="#93AA9C"/>
+                <textElement><font size="7"/></textElement>
+                <text><![CDATA[Big Tites · relatório gerado pelo sistema]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="395" y="4" width="100" height="14" forecolor="#93AA9C"/>
+                <textElement textAlignment="Right"><font size="7"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></textFieldExpression>
+            </textField>
+            <!-- evaluationTime="Report": só sabe o total de páginas no fim -->
+            <textField evaluationTime="Report">
+                <reportElement x="495" y="4" width="40" height="14" forecolor="#93AA9C"/>
+                <textElement><font size="7"/></textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <!-- ================= RESUMO (no fim): totais + gráfico ================= -->
+    <summary>
+        <band height="330">
+            <staticText>
+                <reportElement mode="Opaque" x="0" y="0" width="95" height="22" forecolor="#FFFFFF" backcolor="#123B2E"/>
+                <box leftPadding="6"/>
+                <textElement verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <text><![CDATA[Total]]></text>
+            </staticText>
+            <textField pattern="#,##0">
+                <reportElement mode="Opaque" x="95" y="0" width="70" height="22" forecolor="#FFFFFF" backcolor="#123B2E"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_PEDIDOS}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0">
+                <reportElement mode="Opaque" x="165" y="0" width="70" height="22" forecolor="#FFFFFF" backcolor="#123B2E"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_ITENS}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement mode="Opaque" x="235" y="0" width="100" height="22" forecolor="#E8A317" backcolor="#123B2E"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_VENDIDO}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement mode="Opaque" x="335" y="0" width="100" height="22" forecolor="#FFFFFF" backcolor="#123B2E"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_RECEBIDO}]]></textFieldExpression>
+            </textField>
+            <textField pattern="R$ #,##0.00">
+                <reportElement mode="Opaque" x="435" y="0" width="100" height="22" forecolor="#FFFFFF" backcolor="#123B2E"/>
+                <box rightPadding="6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_PEDIDOS} == 0 ? java.math.BigDecimal.ZERO
+    : $V{TOTAL_VENDIDO}.divide(new java.math.BigDecimal($V{TOTAL_PEDIDOS}), 2, java.math.RoundingMode.HALF_UP)]]></textFieldExpression>
+            </textField>
+
+            <!-- Indicador: quanto falta receber no período -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="30" width="535" height="16" forecolor="#8A5E05">
+                    <printWhenExpression><![CDATA[$V{TOTAL_FALTA}.signum() > 0]]></printWhenExpression>
+                </reportElement>
+                <textElement><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["Falta receber no período: R$ "
+    + new java.text.DecimalFormat("#,##0.00", java.text.DecimalFormatSymbols.getInstance($P{REPORT_LOCALE}))
+        .format($V{TOTAL_FALTA}) + " (detalhe pedido a pedido no relatório Contas a receber)"]]></textFieldExpression>
+            </textField>
+
+            <!-- Sem pedidos no período: diz isso em vez de entregar uma tabela vazia -->
+            <staticText>
+                <reportElement x="0" y="30" width="535" height="16" forecolor="#C4341F">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT} == 0]]></printWhenExpression>
+                </reportElement>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Nenhum pedido no período escolhido.]]></text>
+            </staticText>
+
+            <!-- Gráfico de barras: vendido por dia (usa as mesmas linhas da tabela) -->
+            <barChart>
+                <chart isShowLegend="false" evaluationTime="Report">
+                    <reportElement x="0" y="56" width="535" height="270">
+                        <printWhenExpression><![CDATA[$V{REPORT_COUNT} > 0]]></printWhenExpression>
+                    </reportElement>
+                    <chartTitle color="#123B2E">
+                        <font size="11" isBold="true"/>
+                        <titleExpression><![CDATA["Vendido por dia (R$)"]]></titleExpression>
+                    </chartTitle>
+                    <chartSubtitle/>
+                    <chartLegend/>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Vendido"]]></seriesExpression>
+                        <categoryExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yy").format($F{dia})]]></categoryExpression>
+                        <valueExpression><![CDATA[$F{vendido}]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot isShowTickMarks="false">
+                    <plot backcolor="#FBF9F4">
+                        <seriesColor seriesOrder="0" color="#123B2E"/>
+                    </plot>
+                    <itemLabel/>
+                    <categoryAxisFormat>
+                        <axisFormat>
+                            <tickLabelFont><font size="7"/></tickLabelFont>
+                        </axisFormat>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat>
+                            <tickLabelFont><font size="7"/></tickLabelFont>
+                        </axisFormat>
+                    </valueAxisFormat>
+                </barPlot>
+            </barChart>
+        </band>
+    </summary>
+</jasperReport>

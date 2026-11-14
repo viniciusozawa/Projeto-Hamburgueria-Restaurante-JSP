@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Relatório 6 - Comanda do pedido (JasperReports, formato da versão 6).
+
+  Para que serve: o comprovante de UM pedido, no formato de cupom de caixa:
+  o que foi pedido, quanto custou, quanto já foi pago e quanto falta.
+  Decisões: entregar ao cliente e conferir o caixa antes de dar baixa.
+
+  Parâmetro COD_PEDIDO: o número do pedido (o RelatorioController confere
+  se ele existe antes de chamar o Jasper).
+
+  Diferente dos outros: página estreita (cupom) e isIgnorePagination="true",
+  que faz o PDF ter uma página só, do tamanho exato do conteúdo.
+  A fonte é a DejaVu Sans Mono, que lembra a impressora de cupom.
+
+  Os dados do pedido (cliente, mesa...) se repetem em toda linha do SQL;
+  na faixa "title" o Jasper usa os valores da primeira linha.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="comanda_pedido" pageWidth="300" pageHeight="842" columnWidth="264"
+              leftMargin="18" rightMargin="18" topMargin="18" bottomMargin="18"
+              isIgnorePagination="true" whenNoDataType="AllSectionsNoDetail">
+
+    <style name="Base" isDefault="true" fontName="DejaVu Sans Mono" fontSize="8" forecolor="#1E2A24"/>
+
+    <parameter name="COD_PEDIDO" class="java.lang.Integer"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT p.codpedido,
+       p.datahoraPedido,
+       cl.nomeCliente              AS cliente,
+       m.numeroMesa                AS mesa,
+       m.localMesa                 AS local_mesa,
+       f.nomeFuncionario           AS atendente,
+       c.nomeComida                AS prato,
+       CAST(SUM(pc.quantidade) AS SIGNED) AS quantidade,
+       c.valorComida               AS preco,
+       SUM(pc.quantidade * c.valorComida) AS subtotal,
+       (SELECT COALESCE(SUM(pg.valorPago), 0)
+          FROM pagamento pg
+         WHERE pg.pedido_codpedido = p.codpedido) AS recebido
+  FROM pedido p
+  LEFT JOIN cliente cl    ON cl.codCliente = p.cliente_codCliente
+  LEFT JOIN mesa m        ON m.codMesa = p.mesa_codMesa
+  LEFT JOIN funcionario f ON f.codFuncionario = p.funcionario_codFuncionario
+  LEFT JOIN pedido_por_cardapio pc ON pc.pedido_idpedido = p.codpedido
+  LEFT JOIN cardapio c             ON c.codCardapio = pc.cardapio_codCardapio
+ WHERE p.codpedido = $P{COD_PEDIDO}
+ -- o mesmo prato lançado várias vezes (2x, depois 1x...) vira uma linha só
+ GROUP BY p.codpedido, p.datahoraPedido, cl.nomeCliente, m.numeroMesa, m.localMesa,
+          f.nomeFuncionario, c.codCardapio, c.nomeComida, c.valorComida
+ ORDER BY c.nomeComida
+        ]]>
+    </queryString>
+
+    <field name="codpedido" class="java.lang.Integer"/>
+    <field name="datahoraPedido" class="java.sql.Timestamp"/>
+    <field name="cliente" class="java.lang.String"/>
+    <field name="mesa" class="java.lang.Integer"/>
+    <field name="local_mesa" class="java.lang.String"/>
+    <field name="atendente" class="java.lang.String"/>
+    <field name="prato" class="java.lang.String"/>
+    <field name="quantidade" class="java.lang.Long"/>
+    <field name="preco" class="java.math.BigDecimal"/>
+    <field name="subtotal" class="java.math.BigDecimal"/>
+    <field name="recebido" class="java.math.BigDecimal"/>
+
+    <variable name="TOTAL" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{subtotal} == null ? java.math.BigDecimal.ZERO : $F{subtotal}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+    <variable name="ITENS" class="java.lang.Long" calculation="Sum">
+        <variableExpression><![CDATA[$F{quantidade} == null ? 0L : $F{quantidade}]]></variableExpression>
+        <initialValueExpression><![CDATA[0L]]></initialValueExpression>
+    </variable>
+    <!-- o recebido é o mesmo em todas as linhas: guarda o da primeira -->
+    <variable name="RECEBIDO" class="java.math.BigDecimal" calculation="First">
+        <variableExpression><![CDATA[$F{recebido}]]></variableExpression>
+    </variable>
+    <variable name="FALTA" class="java.math.BigDecimal" calculation="Nothing">
+        <variableExpression><![CDATA[$V{TOTAL}.subtract($V{RECEBIDO} == null ? java.math.BigDecimal.ZERO : $V{RECEBIDO}).max(java.math.BigDecimal.ZERO)]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="128">
+            <staticText>
+                <reportElement mode="Opaque" x="0" y="0" width="264" height="24" forecolor="#E8A317" backcolor="#123B2E"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="12" isBold="true"/></textElement>
+                <text><![CDATA[BIG TITES]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="26" width="264" height="12"/>
+                <textElement textAlignment="Center"><font size="7"/></textElement>
+                <text><![CDATA[hamburgueria · comprovante sem valor fiscal]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="44" width="264" height="18"/>
+                <textElement textAlignment="Center"><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["PEDIDO Nº " + $P{COD_PEDIDO}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="66" width="264" height="12"/>
+                <textFieldExpression><![CDATA[$F{datahoraPedido} == null ? null
+    : "Data:      " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($F{datahoraPedido})]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="78" width="264" height="12"/>
+                <textFieldExpression><![CDATA["Cliente:   " + ($F{cliente} == null ? "não informado" : $F{cliente})]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="90" width="264" height="12"/>
+                <textFieldExpression><![CDATA["Mesa:      " + ($F{mesa} == null ? "-" : $F{mesa}
+    + ($F{local_mesa} == null || $F{local_mesa}.isBlank() ? "" : " (" + $F{local_mesa} + ")"))]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="102" width="264" height="12"/>
+                <textFieldExpression><![CDATA["Atendente: " + ($F{atendente} == null ? "-" : $F{atendente})]]></textFieldExpression>
+            </textField>
+            <line>
+                <reportElement x="0" y="120" width="264" height="1"/>
+                <graphicElement><pen lineWidth="0.75" lineStyle="Dashed"/></graphicElement>
+            </line>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="14">
+            <staticText>
+                <reportElement x="0" y="0" width="190" height="12"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[QTD  ITEM]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="190" y="0" width="74" height="12"/>
+                <textElement textAlignment="Right"><font isBold="true"/></textElement>
+                <text><![CDATA[VALOR]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- duas linhas por item: "2x X-Bacon .... 30,00" e "   15,00 cada" -->
+    <detail>
+        <band height="24">
+            <printWhenExpression><![CDATA[$F{prato} != null]]></printWhenExpression>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="0" width="190" height="12"/>
+                <textFieldExpression><![CDATA[String.format("%2dx  %s", $F{quantidade}, $F{prato})]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="190" y="0" width="74" height="12"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="11" width="190" height="11" forecolor="#6B7A70"/>
+                <textElement><font size="7"/></textElement>
+                <textFieldExpression><![CDATA["     " + new java.text.DecimalFormat("#,##0.00", java.text.DecimalFormatSymbols.getInstance($P{REPORT_LOCALE})).format($F{preco}) + " cada"]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <summary>
+        <band height="120">
+            <staticText>
+                <reportElement x="0" y="2" width="264" height="12" forecolor="#C4341F">
+                    <printWhenExpression><![CDATA[$V{ITENS} == 0]]></printWhenExpression>
+                </reportElement>
+                <text><![CDATA[Pedido ainda sem itens.]]></text>
+            </staticText>
+            <line>
+                <reportElement x="0" y="18" width="264" height="1"/>
+                <graphicElement><pen lineWidth="0.75" lineStyle="Dashed"/></graphicElement>
+            </line>
+            <textField>
+                <reportElement x="0" y="24" width="160" height="12"/>
+                <textFieldExpression><![CDATA[$V{ITENS} + ($V{ITENS} == 1 ? " item" : " itens")]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="38" width="160" height="16"/>
+                <textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[TOTAL]]></text>
+            </staticText>
+            <textField pattern="R$ #,##0.00">
+                <reportElement x="140" y="38" width="124" height="16"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="56" width="140" height="12"/>
+                <text><![CDATA[Pago]]></text>
+            </staticText>
+            <textField pattern="R$ #,##0.00">
+                <reportElement x="140" y="56" width="124" height="12"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$V{RECEBIDO} == null ? java.math.BigDecimal.ZERO : $V{RECEBIDO}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="68" width="140" height="12"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Falta pagar]]></text>
+            </staticText>
+            <textField pattern="R$ #,##0.00">
+                <reportElement x="140" y="68" width="124" height="12"/>
+                <textElement textAlignment="Right"><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$V{FALTA}]]></textFieldExpression>
+            </textField>
+
+            <!-- carimbo: PAGO em verde ou EM ABERTO em vermelho (mesma regra do painel) -->
+            <textField>
+                <reportElement mode="Opaque" x="62" y="88" width="140" height="22" forecolor="#FFFFFF" backcolor="#1C5340">
+                    <printWhenExpression><![CDATA[$V{ITENS} > 0 && $V{FALTA}.signum() == 0]]></printWhenExpression>
+                </reportElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["PAGO"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement mode="Opaque" x="62" y="88" width="140" height="22" forecolor="#FFFFFF" backcolor="#C4341F">
+                    <printWhenExpression><![CDATA[$V{FALTA}.signum() > 0]]></printWhenExpression>
+                </reportElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["EM ABERTO"]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

@@ -2685,3 +2685,90 @@ button[aria-busy="true"] { cursor: progress; opacity: 0.85; transform: none !imp
 .conta-pago-linha span { color: var(--gordura); font-size: 0.78rem; }
 .conta-pago-linha b:last-child { margin-left: auto; }
 .conta-pago-itens { margin: 3px 0 0; color: var(--texto-corpo); font-size: 0.8rem; }
+
+/* ============================================================
+   RELATÓRIOS (Relatorios.jsp)
+   Cada relatório é uma ficha de papel: número em Courier no topo,
+   como a comanda, e régua mostarda à esquerda ao passar o mouse
+   (mesmo gesto do .module-card do painel).
+   ============================================================ */
+.rel-intro { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; max-width: 70ch; }
+
+.rel-atalhos { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.rel-aviso {
+    margin: 14px 0 0;
+    padding: 10px 14px;
+    border-left: 3px solid var(--pimenta);
+    background: rgba(196,52,31,0.08);
+    color: var(--pimenta);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.rel-card {
+    background: var(--papel-claro);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px 18px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: border-left-color 0.18s, box-shadow 0.18s;
+}
+.rel-card:hover { border-left-color: var(--mostarda); box-shadow: 0 6px 18px rgba(11,34,25,0.1); }
+
+.rel-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border);
+}
+.rel-num { font-family: var(--fonte-comanda); font-weight: 700; font-size: 0.82rem; color: var(--mostarda-tinta); }
+.rel-icone { color: var(--primary); font-size: 1.1rem; }
+
+.rel-titulo {
+    font-family: var(--fonte-placa);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin: 0 0 6px;
+}
+.rel-pergunta { font-size: 0.9rem; color: var(--text); margin: 0 0 6px; }
+.rel-decisao  { font-size: 0.82rem; color: var(--muted); margin: 0 0 14px; line-height: 1.4; }
+.rel-decisao b { color: var(--primary); font-weight: 600; }
+
+/* o formulário vai para o pé da ficha, alinhando os botões entre cartões */
+.rel-form {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.rel-filtro {
+    font-size: 0.74rem;
+    color: var(--muted);
+    background: var(--papel-linha);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+.rel-filtro i { margin-right: 3px; }
+.rel-pedido { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--muted); margin: 0; }
+.rel-pedido input { width: 90px; }
+.rel-botoes { display: flex; gap: 8px; margin-left: auto; }
+.btn-sm-rel { padding: 6px 16px; font-size: 0.82rem; }
+
+.rel-em-breve { opacity: 0.6; }
+.rel-em-breve:hover { border-left-color: var(--border); box-shadow: none; }
+.rel-breve {
+    margin: auto 0 0;
+    font-family: var(--fonte-comanda);
+    font-size: 0.82rem;
+    color: var(--muted);
+}

@@ -53,6 +53,15 @@
                 </a>
             </li>
 
+            <%-- a regra vem de service/Permissoes (hoje só o ADMIN) --%>
+            <c:if test="${sessionScope.usuario.pode('RelatorioController', 'listar')}">
+                <li class="nav-item px-1">
+                    <a class="nav-link" href="${pageContext.request.contextPath}${URL_BASE}/RelatorioController">
+                        <i class="fa-solid fa-chart-line me-1" aria-hidden="true"></i>Relatórios
+                    </a>
+                </li>
+            </c:if>
+
             <c:if test="${sessionScope.usuario.podeAdministrar}">
                 <li class="nav-item dropdown px-1">
                 <a class="nav-link dropdown-toggle" href="#" id="menuMais" role="button"
